@@ -12,7 +12,7 @@ import "./sidebarStyles.css"
 import "../accordionStyles.scss";
 import Accordion from "../accordion";
 import Modal from 'react-modal';
-
+import Layer from "./slider";
 
 
 
@@ -43,48 +43,6 @@ export const MapboxGLMap = ({
     const [ visibilityF, setVisibilityF]= useState('visible')
 
 
-    const [modalIsOpen,setIsOpen] = React.useState(false);
-    function openModal() {
-        setIsOpen(true);
-    }
-
-    function afterOpenModal() {
-        // references are now sync'd and can be accessed.
-        console.log('opened')
-    }
-
-    function closeModal(){
-        setIsOpen(false);
-    }
-
-    const modalStyles = {
-        overlay: {
-            backgroundColor: 'rgba(0, 0, 0 , 0.5)'
-        },
-        content: {
-            position: 'absolute',
-            zIndex: 1000,
-            top: '30vh',
-            left: '30vw',
-            right: '30vw',
-            bottom: '30vh',
-            border: '1px solid #ccc',
-            background: '#fff',
-            overflow: 'auto',
-            WebkitOverflowScrolling: 'touch',
-            borderRadius: '4px',
-            outline: 'none',
-            padding: '20px'
-        }
-    };
-
-    Modal.setAppElement(document.getElementById('root'));
-
-
-
-
-
-
 
 
 
@@ -103,9 +61,18 @@ export const MapboxGLMap = ({
 
     }
 
+    //
+    // var slider = document.getElementById('slider');
+    // var sliderValue = document.getElementById('slider-value');
 
-    var slider = document.getElementById('slider');
-    var sliderValue = document.getElementById('slider-value');
+    const [ sliderValue, setSliderValue ] = useState(100);
+
+
+    function handleChange(e) {
+        console.log(e.target.value);
+    }
+
+
 
 
     const initMap = () => {
@@ -380,15 +347,13 @@ export const MapboxGLMap = ({
             statefulMap.setLayoutProperty('aughts20classes', 'visibility', `${visibilityF}`)
 
 
-            slider.addEventListener('input', function (e) {
-                statefulMap.setPaintProperty(
-                    'aoi-solid-fill',
-                    'fill-opacity',
-                    parseInt(e.target.value, 10) / 100
-                );
+            statefulMap.setPaintProperty(
+                'aoi-solid-fill',
+                'fill-opacity',
+                parseInt(`${sliderValue}`, 10) / 100
+            );
 
-                sliderValue.textContent = e.target.value + '%';
-            });
+
 
 
 
@@ -416,7 +381,7 @@ export const MapboxGLMap = ({
             }
         }
 
-    }, [statefulMap, getSelectedID(), visibilityA, visibilityB, visibilityC, visibilityD, visibilityE, visibilityF ])
+    }, [statefulMap, getSelectedID(), visibilityA, visibilityB, visibilityC, visibilityD, visibilityE, visibilityF, sliderValue ])
 
 
 
@@ -427,69 +392,20 @@ export const MapboxGLMap = ({
                ref={mapContainer}/>
           <Menu customBurgerIcon={ <FiLayers /> } isOpen={ true } noOverlay={true}>
                   <Accordion title="Primary Layers" >
-                      <div style={{float:'left', width: '100%'}}>
-                          <label style={{float:'inherit',
-                              display: 'inline-block',
-                              'verticalAlign':'top',
-                              'width': '75%'}}>
-                              <Toggle
-                                  icons={false}
-                                  defaultChecked={false}
-                                  onChange={ (e) => {
-                                      if(e.target.checked == false) {
-                                          setVisibilityA('none')
-                                      }
-                                      else {
-                                          setVisibilityA('visible')
-                                      }
+
+                          <Layer
+                              layerTitle={'ECL Tracts'}
+                              onToggleChange={ (e) => {
+                                  if(e.target.checked == false) {
+                                      setVisibilityA('none')
                                   }
-                                  }/>
-                              <div id='label' style={{
-                                  display: 'inline-block',
-                                  'verticalAlign':'top',
-                                  'width': '75%',
-                                  'wordWrap': 'break-word'}}>
-                                  {'ECL Tracts'}
-                              </div>
-                          </label>
-                          <span style={{float: 'right',
-                              width: '25%',
-                              display: 'inline-block',
-                              'verticalAlign': 'top'}}>
-                              <span>
-                                  <AiOutlineInfoCircle onClick={openModal}  />
-                                  <Modal
-                                      isOpen={modalIsOpen}
-                                      onAfterOpen={afterOpenModal}
-                                      onRequestClose={closeModal}
-                                      style={modalStyles}
-                                      contentLabel="Layer A"
-                                  >
-                                  <h1>Layer Title</h1>
-                                      <h4>Description</h4>
-                                        <p>Layer description.</p>
-                                      <h4>Source</h4>
-                                        <p>Source details.</p>
-                                  </Modal>
-                              </span>
-
-                              <MdOpacity onClick={openModal}/>
-                          </span>
-                          <div className="map-overlay top">
-                              <div className="map-overlay-inner">
-                                  <input
-                                      id="slider"
-                                      type="range"
-                                      min="0"
-                                      max="100"
-                                      step="0"
-                                      style={{width: '75%'}}
-                                  />
-                                  <span id="slider-value">100%</span>
-                              </div>
-                          </div>
-
-                      </div>
+                                  else {
+                                      setVisibilityA('visible')
+                                  }
+                              }}
+                              onSliderChange={(e) => setSliderValue(e.target.value)}
+                              sliderChangeValue={sliderValue}
+                          />
 
                       <label>
                           <Toggle
