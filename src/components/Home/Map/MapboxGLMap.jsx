@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Menu from 'react-burger-menu/lib/menus/slide'
@@ -13,6 +13,8 @@ import Accordion from "../accordion";
 import Layer from "./layer";
 import Legend from "./Legend";
 
+
+
 const styles = {
     width: "100vw",
     height: "93vh",
@@ -21,6 +23,8 @@ const styles = {
     bottom: "0vh",
     position: "absolute"
 }
+
+
 
 export const MapboxGLMap = ({
                                 data,
@@ -441,35 +445,43 @@ export const MapboxGLMap = ({
           <div style={styles}
                ref={mapContainer}/>
 
+          <div className={'legendBox'} >
 
 
+              {(visibilityA === 'visible') ?
 
-        <div className={'legendBox'} >
-            {(visibilityA === 'visible') ?
-
-                <Legend
-                    legendLayerTitle={'ECL Tracts'}
-                    itemArray={ECLBreaksLegend}
-                    legendLayerFormat={'Area in m2'}/>
-                :
-                null
-            }
+                  <Legend
+                      legendLayerTitle={'ECL Tracts'}
+                      itemArray={ECLBreaksLegend}
+                      legendLayerFormat={'Area in m2'}/>
+                  :
+                  null
+              }
 
 
-            {(visibilityC === 'visible' ||
-                visibilityD === 'visible' ||
-                visibilityE === 'visible' ||
-                visibilityF === 'visible') ?
+              {(
+                  visibilityD === 'visible' ||
+                  visibilityE === 'visible') ?
 
-                <Legend
-                    legendLayerTitle={'Land Cover Type'}
-                    itemArray={landClassLegend}/>
-                :
-                null
-            }
-        </div>
+                  <Legend
+                      legendLayerTitle={'Land Cover Type'}
+                      itemArray={landClassLegend}/>
+                  :
+                  null
+              }
 
 
+              {(visibilityC === 'visible' ||
+                  visibilityF === 'visible') ?
+
+                  <Legend
+                      legendLayerTitle={'Land Cover Type'}
+                      itemArray={landClassLegend}/>
+                  :
+                  null
+              }
+
+          </div>
 
           <Menu customBurgerIcon={ <FiLayers /> } isOpen={ true } noOverlay={true}>
                   <Accordion title="Primary Layers" >
@@ -588,3 +600,4 @@ export const MapboxGLMap = ({
 
     )
 }
+
