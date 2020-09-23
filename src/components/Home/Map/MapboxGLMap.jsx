@@ -2,19 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Menu from 'react-burger-menu/lib/menus/slide'
-import Toggle from 'react-toggle'
 import { FiLayers } from 'react-icons/fi';
-import { AiOutlineInfoCircle } from 'react-icons/ai';
-import { MdOpacity } from 'react-icons/md';
+
 
 import "../toggleStyles.css"
 import "./sidebarStyles.css"
 import "../accordionStyles.scss";
+import "./legendStyle.css"
 import Accordion from "../accordion";
-import Modal from 'react-modal';
-import Layer from "./slider";
-
-
+import Layer from "./layer";
+import Legend from "./Legend";
 
 const styles = {
     width: "100vw",
@@ -36,11 +33,70 @@ export const MapboxGLMap = ({
     const [statefulMap, setStatefulMap] = useState(null)
 
     const [ visibilityA, setVisibilityA]= useState('none')
+    const [ sliderValueA, setSliderValueA ] = useState(100);
+
     const [ visibilityB, setVisibilityB]= useState('visible')
+    const [ sliderValueB, setSliderValueB ] = useState(100);
+
     const [ visibilityC, setVisibilityC]= useState('none')
+    const [ sliderValueC, setSliderValueC ] = useState(100);
+
     const [ visibilityD, setVisibilityD]= useState('none')
+    const [ sliderValueD, setSliderValueD ] = useState(100);
+
     const [ visibilityE, setVisibilityE]= useState('none')
+    const [ sliderValueE, setSliderValueE ] = useState(100);
+
     const [ visibilityF, setVisibilityF]= useState('visible')
+    const [ sliderValueF, setSliderValueF ] = useState(100);
+
+    const landClassStyles = ['native forest',
+        '#668823',
+        'scrub',
+        '#640b2a',
+        'grass',
+        '#AADECC',
+        'crop',
+        '#FADD45',
+        'water',
+        '#5567AA',
+        'planation',
+        '#307633',
+        'urban',
+        '#BB0111',
+        /* other */ '#cccccc']
+
+
+    const landClassLegend = landClassStyles.reduce(function(result, value, index, array) {
+        if (index % 2 === 0)
+            result.push(array.slice(index, index + 2));
+        return result;
+    }, []);
+
+
+
+    const ECLBreaks = [0,
+        '#a1d99b',
+        '1k',
+        '#74C476',
+        '100M',
+        '#41AB5D',
+        '150M',
+        '#238B45',
+        '500M',
+        '#005A32'
+    ];
+
+
+
+    const ECLBreaksLegend = ECLBreaks.reduce(function(result, value, index, array) {
+        if (index % 2 === 0)
+            result.push(array.slice(index, index + 2));
+        return result;
+    }, []);
+
+
+
 
 
 
@@ -60,19 +116,6 @@ export const MapboxGLMap = ({
         return fc
 
     }
-
-    //
-    // var slider = document.getElementById('slider');
-    // var sliderValue = document.getElementById('slider-value');
-
-    const [ sliderValue, setSliderValue ] = useState(100);
-
-
-    function handleChange(e) {
-        console.log(e.target.value);
-    }
-
-
 
 
     const initMap = () => {
@@ -118,7 +161,7 @@ export const MapboxGLMap = ({
                     type: 'fill',
                     paint: {'fill-color': getFillColor(colorBreaks)}
                 })
-            };
+            }
 
             mapboxGlMap.addSource('aughts05classes', {
                 type: 'geojson',
@@ -135,21 +178,7 @@ export const MapboxGLMap = ({
                     'fill-color': [
                         'match',
                         ['get', 'F2005'],
-                        'native forest',
-                        '#668823',
-                        'scrub',
-                        '#640b2a',
-                        'grass',
-                        '#AADECC',
-                        'crop',
-                        '#FADD45',
-                        'water',
-                        '#5567AA',
-                        'planation',
-                        '#307633',
-                        'urban',
-                        '#BB0111',
-                        /* other */ '#ccc'
+                        ...landClassStyles
                     ]
                 }
 
@@ -170,21 +199,7 @@ export const MapboxGLMap = ({
                     'fill-color': [
                         'match',
                         ['get', 'F2010'],
-                        'native forest',
-                        '#668823',
-                        'scrub',
-                        '#640b2a',
-                        'grass',
-                        '#AADECC',
-                        'crop',
-                        '#FADD45',
-                        'water',
-                        '#5567AA',
-                        'planation',
-                        '#307633',
-                        'urban',
-                        '#BB0111',
-                        /* other */ '#ccc'
+                        ...landClassStyles
                     ]
                 }
 
@@ -205,21 +220,7 @@ export const MapboxGLMap = ({
                     'fill-color': [
                         'match',
                         ['get', 'F2015'],
-                        'native forest',
-                        '#668823',
-                        'scrub',
-                        '#640b2a',
-                        'grass',
-                        '#AADECC',
-                        'crop',
-                        '#FADD45',
-                        'water',
-                        '#5567AA',
-                        'planation',
-                        '#307633',
-                        'urban',
-                        '#BB0111',
-                        /* other */ '#ccc'
+                        ...landClassStyles
                     ]
                 }
 
@@ -229,6 +230,9 @@ export const MapboxGLMap = ({
                 type: 'geojson',
                 data: 'https://raw.githubusercontent.com/eastcoasting/test/master/aughts20classes.json'
             });
+
+
+
 
             ///https://waterdata.usgs.gov/blog/tolcolors/
             mapboxGlMap.addLayer({
@@ -240,25 +244,12 @@ export const MapboxGLMap = ({
                     'fill-color': [
                         'match',
                         ['get', 'F2020'],
-                        'native forest',
-                        '#668823',
-                        'scrub',
-                        '#640b2a',
-                        'grass',
-                        '#AADECC',
-                        'crop',
-                        '#FADD45',
-                        'water',
-                        '#5567AA',
-                        'planation',
-                        '#307633',
-                        'urban',
-                        '#BB0111',
-                        /* other */ '#ccc'
+                        ...landClassStyles
                     ]
                 }
 
             });
+
 
             mapboxGlMap.addLayer({
                 id: 'aoi-solid-line',
@@ -305,8 +296,8 @@ export const MapboxGLMap = ({
                     .addTo(mapboxGlMap);
 
                 //Zoom in
-                var coordinates = e.features[0].geometry.coordinates[0];
-                var bounds = coordinates.reduce(function (bounds, coord) {
+                const coordinates = e.features[0].geometry.coordinates[0];
+                const bounds = coordinates.reduce(function (bounds, coord) {
                     return bounds.extend(coord);
                 }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
 
@@ -325,6 +316,11 @@ export const MapboxGLMap = ({
 
             });
 
+            const layerStyles = mapboxGlMap.getStyle().layers
+
+            console.log(layerStyles)
+
+
             setStatefulMap(mapboxGlMap)
             console.log('mapStateful set in state')
         })
@@ -337,24 +333,6 @@ export const MapboxGLMap = ({
         if (!statefulMap) {
             initMap()
         } else {
-            console.log('useEffect running! statefulMap or selectedId must have changed.')
-
-            statefulMap.setLayoutProperty('aoi-solid-fill', 'visibility', `${visibilityA}`)
-            statefulMap.setLayoutProperty('S2-layer', 'visibility', `${visibilityB}`)
-            statefulMap.setLayoutProperty('aughts05classes', 'visibility', `${visibilityC}`)
-            statefulMap.setLayoutProperty('aughts10classes', 'visibility', `${visibilityD}`)
-            statefulMap.setLayoutProperty('aughts15classes', 'visibility', `${visibilityE}`)
-            statefulMap.setLayoutProperty('aughts20classes', 'visibility', `${visibilityF}`)
-
-
-            statefulMap.setPaintProperty(
-                'aoi-solid-fill',
-                'fill-opacity',
-                parseInt(`${sliderValue}`, 10) / 100
-            );
-
-
-
 
 
             if (getSelectedID()) {
@@ -366,9 +344,9 @@ export const MapboxGLMap = ({
                     'rgba(0,0,0,0)'
                 ]);
 
-                var aoiFeatures = data.features.filter(feature => feature.properties.id === parseInt(getSelectedID()));
-                var coordinates = (aoiFeatures[0].geometry.coordinates[0][0]);
-                var bounds = coordinates.reduce(function (bounds, coord) {
+                const aoiFeatures = data.features.filter(feature => feature.properties.id === parseInt(getSelectedID()));
+                const coordinates = (aoiFeatures[0].geometry.coordinates[0][0]);
+                const bounds = coordinates.reduce(function (bounds, coord) {
                     return bounds.extend(coord);
                 }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
                 statefulMap.fitBounds(bounds, {
@@ -379,9 +357,81 @@ export const MapboxGLMap = ({
                 statefulMap.setPaintProperty('aoi-highlight', 'line-color', 'rgba(0,0,0,0)')
                 statefulMap.flyTo({center: [107, 13], zoom: 8});
             }
+
         }
 
-    }, [statefulMap, getSelectedID(), visibilityA, visibilityB, visibilityC, visibilityD, visibilityE, visibilityF, sliderValue ])
+    }, [statefulMap,
+        getSelectedID()
+    ])
+
+
+
+
+    useEffect(() => {
+
+        if (!statefulMap) {
+        } else {
+
+            statefulMap.setLayoutProperty('aoi-solid-fill', 'visibility', `${visibilityA}`)
+            statefulMap.setPaintProperty(
+                'aoi-solid-fill',
+                'fill-opacity',
+                parseInt(`${sliderValueA}`, 10) / 100
+            );
+
+            statefulMap.setLayoutProperty('S2-layer', 'visibility', `${visibilityB}`)
+            statefulMap.setPaintProperty(
+                'S2-layer',
+                'raster-opacity',
+                parseInt(`${sliderValueB}`, 10) / 100
+            );
+
+            statefulMap.setLayoutProperty('aughts05classes', 'visibility', `${visibilityC}`)
+            statefulMap.setPaintProperty(
+                'aughts05classes',
+                'fill-opacity',
+                parseInt(`${sliderValueC}`, 10) / 100
+            );
+
+            statefulMap.setLayoutProperty('aughts10classes', 'visibility', `${visibilityD}`)
+            statefulMap.setPaintProperty(
+                'aughts10classes',
+                'fill-opacity',
+                parseInt(`${sliderValueD}`, 10) / 100
+            );
+
+            statefulMap.setLayoutProperty('aughts15classes', 'visibility', `${visibilityE}`)
+            statefulMap.setPaintProperty(
+                'aughts15classes',
+                'fill-opacity',
+                parseInt(`${sliderValueE}`, 10) / 100
+            );
+
+            statefulMap.setLayoutProperty('aughts20classes', 'visibility', `${visibilityF}`)
+            statefulMap.setPaintProperty(
+                'aughts20classes',
+                'fill-opacity',
+                parseInt(`${sliderValueF}`, 10) / 100
+            );
+
+
+        }
+
+    }, [statefulMap,
+        visibilityA,
+        visibilityB,
+        visibilityC,
+        visibilityD,
+        visibilityE,
+        visibilityF,
+        sliderValueA,
+        sliderValueB,
+        sliderValueC,
+        sliderValueD,
+        sliderValueE,
+        sliderValueF,
+
+    ])
 
 
 
@@ -390,101 +440,144 @@ export const MapboxGLMap = ({
       <div>
           <div style={styles}
                ref={mapContainer}/>
+
+
+
+
+        <div className={'legendBox'} >
+            {(visibilityA === 'visible') ?
+
+                <Legend
+                    legendLayerTitle={'ECL Tracts'}
+                    itemArray={ECLBreaksLegend}
+                    legendLayerFormat={'Area in m2'}/>
+                :
+                null
+            }
+
+
+            {(visibilityC === 'visible' ||
+                visibilityD === 'visible' ||
+                visibilityE === 'visible' ||
+                visibilityF === 'visible') ?
+
+                <Legend
+                    legendLayerTitle={'Land Cover Type'}
+                    itemArray={landClassLegend}/>
+                :
+                null
+            }
+        </div>
+
+
+
           <Menu customBurgerIcon={ <FiLayers /> } isOpen={ true } noOverlay={true}>
                   <Accordion title="Primary Layers" >
 
                           <Layer
                               layerTitle={'ECL Tracts'}
+                              sourceDetails={'Indufor 2020'}
+                              layerDescription={'ECL Tracts'}
+                              defaultChecked={false}
                               onToggleChange={ (e) => {
-                                  if(e.target.checked == false) {
+                                  if(e.target.checked === false) {
                                       setVisibilityA('none')
                                   }
                                   else {
                                       setVisibilityA('visible')
                                   }
                               }}
-                              onSliderChange={(e) => setSliderValue(e.target.value)}
-                              sliderChangeValue={sliderValue}
+                              onSliderChange={(e) => setSliderValueA(e.target.value)}
+                              sliderChangeValue={sliderValueA}
                           />
 
-                      <label>
-                          <Toggle
-                              icons={false}
-                              defaultChecked={true}
-                              onChange={ (e) => {
-                                  if(e.target.checked == false) {
-                                      setVisibilityB('none')
-                                  }
-                                  else {
-                                      setVisibilityB('visible')
-                                  }
+                      <Layer
+                          layerTitle={'S2 Layer'}
+                          sourceDetails={'Indufor 2020'}
+                          layerDescription={'S2 Layer'}
+                          defaultChecked={true}
+                          onToggleChange={ (e) => {
+                              if(e.target.checked === false) {
+                                  setVisibilityB('none')
                               }
-                              }/>
-                          <span style={{padding: '0.5em'}}>{'S2 Layer'}</span>
-                      </label>
+                              else {
+                                  setVisibilityB('visible')
+                              }
+                          }}
+                          onSliderChange={(e) => setSliderValueB(e.target.value)}
+                          sliderChangeValue={sliderValueB}
+                      />
                   </Accordion>
 
               <Accordion title="Land Classification">
-                  <label>
-                      <Toggle
-                          icons={false}
-                          defaultChecked={false}
-                          onChange={ (e) => {
-                              if(e.target.checked == false) {
-                                  setVisibilityC('none')
-                              }
-                              else {
-                                  setVisibilityC('visible')
-                              }
+                  <Layer
+                      layerTitle={'2005 Classes'}
+                      sourceDetails={'Indufor 2020'}
+                      layerDescription={'2005 Classes'}
+                      defaultChecked={false}
+                      onToggleChange={ (e) => {
+                          if(e.target.checked === false) {
+                              setVisibilityC('none')
                           }
-                          }/>
-                      <span style={{padding: '0.5em'}}>{'2005 Classes'}</span>
-                  </label>
-                  <label>
-                      <Toggle
-                          icons={false}
-                          defaultChecked={false}
-                          onChange={ (e) => {
-                              if(e.target.checked == false) {
-                                  setVisibilityD('none')
-                              }
-                              else {
-                                  setVisibilityD('visible')
-                              }
+                          else {
+                              setVisibilityC('visible')
                           }
-                          }/>
-                      <span style={{padding: '0.5em'}}>{'2010 Classes'}</span>
-                  </label>
-                  <label>
-                      <Toggle
-                          icons={false}
-                          defaultChecked={false}
-                          onChange={ (e) => {
-                              if(e.target.checked == false) {
-                                  setVisibilityE('none')
-                              }
-                              else {
-                                  setVisibilityE('visible')
-                              }
+                      }}
+                      onSliderChange={(e) => setSliderValueC(e.target.value)}
+                      sliderChangeValue={sliderValueC}
+                  />
+
+                  <Layer
+                      layerTitle={'2010 Classes'}
+                      sourceDetails={'Indufor 2020'}
+                      layerDescription={'2010 Classes'}
+                      defaultChecked={false}
+                      onToggleChange={ (e) => {
+                          if(e.target.checked === false) {
+                              setVisibilityD('none')
                           }
-                          }/>
-                      <span style={{padding: '0.5em'}}>{'2015 Classes'}</span>
-                  </label>
-                  <label>
-                      <Toggle
-                          icons={false}
-                          defaultChecked={true}
-                          onChange={ (e) => {
-                              if(e.target.checked == false) {
-                                  setVisibilityF('none')
-                              }
-                              else {
-                                  setVisibilityF('visible')
-                              }
+                          else {
+                              setVisibilityD('visible')
                           }
-                          }/>
-                      <span style={{padding: '0.5em'}}>{'2020 Classes'}</span>
-                  </label>
+                      }}
+                      onSliderChange={(e) => setSliderValueD(e.target.value)}
+                      sliderChangeValue={sliderValueD}
+                  />
+
+                  <Layer
+                      layerTitle={'2015 Classes'}
+                      sourceDetails={'Indufor 2020'}
+                      layerDescription={'2015 Classes'}
+                      defaultChecked={false}
+                      onToggleChange={ (e) => {
+                          if(e.target.checked === false) {
+                              setVisibilityE('none')
+                          }
+                          else {
+                              setVisibilityE('visible')
+                          }
+                      }}
+                      onSliderChange={(e) => setSliderValueE(e.target.value)}
+                      sliderChangeValue={sliderValueE}
+                  />
+
+                  <Layer
+                      layerTitle={'2020 Classes'}
+                      sourceDetails={'Indufor 2020'}
+                      layerDescription={'2020 Classes'}
+                      defaultChecked={true}
+                      onToggleChange={ (e) => {
+                          if(e.target.checked === false) {
+                              setVisibilityF('none')
+                          }
+                          else {
+                              setVisibilityF('visible')
+                          }
+                      }}
+                      onSliderChange={(e) => setSliderValueF(e.target.value)}
+                      sliderChangeValue={sliderValueF}
+                  />
+
               </Accordion>
 
           </Menu>

@@ -1,0 +1,39 @@
+.legend {
+    background-color: #fff;
+    position: relative;
+    border-radius: 3px;
+    bottom: 30px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font: 16px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    padding: 10px;
+    width: 23vw;
+    height: 17vh;
+    z-index: 1;
+}
+
+.legendBox {
+    background-color: #c8c8c8;
+    position: absolute;
+    border-radius: 3px;
+    bottom: 30px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font: 16px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    padding: 10px;
+    right: 6vw;
+    overflow: auto;
+    width: 25vw;
+    height: 25vh;
+    z-index: 1;
+}
+
+.legend h4 {
+    margin: 0 0 10px;
+}
+
+.legend div span {
+    border-radius: 0%;
+    display: inline-block;
+    height: 20px;
+    margin-right: 5px;
+    width: 30px;
+}

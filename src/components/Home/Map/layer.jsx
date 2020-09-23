@@ -3,7 +3,7 @@ import Toggle from "react-toggle";
 import {AiOutlineInfoCircle} from "react-icons/ai";
 import Modal from "react-modal";
 import {MdOpacity} from "react-icons/md";
-
+import './layerStyles.css'
 
 
 const Layer = ({ onSliderChange,
@@ -11,10 +11,13 @@ const Layer = ({ onSliderChange,
                  onToggleChange,
                  layerTitle,
                  sourceDetails,
-                 layerDescription}) => {
+                 layerDescription,
+                 defaultChecked}) => {
 
 
     const [hideSlider, setHideSlider] = useState(false)
+
+
 
 
     const [modalIsOpen,setIsOpen] = useState(false);
@@ -51,7 +54,6 @@ const Layer = ({ onSliderChange,
             padding: '20px'
         }
     };
-    Modal.setAppElement(document.getElementById('root'));
 
 
 
@@ -63,7 +65,7 @@ const Layer = ({ onSliderChange,
             'width': '75%'}}>
             <Toggle
                 icons={false}
-                defaultChecked={false}
+                defaultChecked={defaultChecked}
                 onChange={onToggleChange}
             />
             <div id='label' style={{
@@ -80,7 +82,9 @@ const Layer = ({ onSliderChange,
             display: 'inline-block',
             'verticalAlign': 'top'}}>
                               <span>
-                                  <AiOutlineInfoCircle onClick={openModal}  />
+                                  <AiOutlineInfoCircle
+                                      className={'modalToggle'}
+                                      onClick={openModal}  />
                                   <Modal
                                       isOpen={modalIsOpen}
                                       onAfterOpen={afterOpenModal}
@@ -96,27 +100,29 @@ const Layer = ({ onSliderChange,
                                   </Modal>
                               </span>
 
-                              <MdOpacity onClick={() => setHideSlider(!hideSlider)}/>
+                              <MdOpacity className={'opacityToggle'}
+                                         onClick={() => setHideSlider(!hideSlider)}
+                              />
                           </span>
 
             {hideSlider ?
-                <div className="map-overlay-inner">
-                    <input
-                        id="slider"
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={sliderChangeValue}
-                        onChange={onSliderChange}
-                        step="0"
-                        style={{width: '75%'}}
-                    />
-                    <span id="slider-value">{sliderChangeValue}%</span>
-                </div>
+
+                  <div className="slider">
+                      <input
+                          id="slider"
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={sliderChangeValue}
+                          onChange={onSliderChange}
+                          step="0"
+                          style={{width: '75%'}}
+                      />
+                      <span id="slider-value">{sliderChangeValue}%</span>
+                  </div>
                 :
                 null
             }
-
     </div>
     )
 
