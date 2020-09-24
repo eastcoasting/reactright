@@ -2,9 +2,9 @@ import React, {useState }from "react";
 import Toggle from "react-toggle";
 import {AiOutlineInfoCircle} from "react-icons/ai";
 import Modal from "react-modal";
-import {MdOpacity} from "react-icons/md";
-import './layerStyles.css'
+import {MdOpacity, MdSwapVert} from "react-icons/md";
 
+import './layerStyles.css'
 
 const Layer = ({ onSliderChange,
                  sliderChangeValue,
@@ -12,7 +12,8 @@ const Layer = ({ onSliderChange,
                  layerTitle,
                  sourceDetails,
                  layerDescription,
-                 defaultChecked}) => {
+                 defaultChecked,
+                 layerToTop}) => {
 
 
     const [hideSlider, setHideSlider] = useState(false)
@@ -62,7 +63,7 @@ const Layer = ({ onSliderChange,
         <label style={{float:'inherit',
             display: 'inline-block',
             'verticalAlign':'top',
-            'width': '75%'}}>
+            'width': '70%'}}>
             <Toggle
                 icons={false}
                 defaultChecked={defaultChecked}
@@ -71,16 +72,16 @@ const Layer = ({ onSliderChange,
             <div id='label' style={{
                 display: 'inline-block',
                 'verticalAlign':'top',
-                'width': '75%',
+                width: '70%',
+                paddingLeft: '5px',
                 'wordWrap': 'break-word'}}>
                 {layerTitle}
             </div>
         </label>
 
         <span style={{float: 'right',
-            width: '25%',
             display: 'inline-block',
-            'verticalAlign': 'top'}}>
+            verticalAlign: 'top'}}>
                               <span>
                                   <AiOutlineInfoCircle
                                       className={'modalToggle'}
@@ -103,6 +104,28 @@ const Layer = ({ onSliderChange,
                               <MdOpacity className={'opacityToggle'}
                                          onClick={() => setHideSlider(!hideSlider)}
                               />
+                              <svg onClick={layerToTop} className={'layerToTopGroup'}>
+
+
+                              <path
+                                  className={'layerToTop'}
+                                  d="M16 99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"></path>
+                                  <path
+                                      className={'layerToBottom'}
+                                      d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5  3z"></path>
+
+                              </svg>
+
+
+
+
+
+
+
+
+
+
+
                           </span>
 
             {hideSlider ?

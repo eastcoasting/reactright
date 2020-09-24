@@ -38,9 +38,12 @@ export const MapboxGLMap = ({
 
     const [ visibilityA, setVisibilityA]= useState('none')
     const [ sliderValueA, setSliderValueA ] = useState(100);
+    const [ toTop, setToTop]= useState(null)
+
 
     const [ visibilityB, setVisibilityB]= useState('visible')
     const [ sliderValueB, setSliderValueB ] = useState(100);
+
 
     const [ visibilityC, setVisibilityC]= useState('none')
     const [ sliderValueC, setSliderValueC ] = useState(100);
@@ -166,6 +169,25 @@ export const MapboxGLMap = ({
                     paint: {'fill-color': getFillColor(colorBreaks)}
                 })
             }
+
+            ///How to serve ESRI REST DATA
+            /*mapboxGlMap.addLayer({
+                'id': 'parks-layer',
+                'type': 'fill',
+                'source': {
+                    'type': 'geojson',
+                    'data': 'https://services2.arcgis.com/YnuAMVoynZj0G4sm/ArcGIS/rest/services/stands_gdb/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryPolygon&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token='
+
+},
+                'paint': {
+                    'fill-color': 'rgba(200, 100, 240, 0.5)',
+                    'fill-outline-color': 'rgba(200, 100, 240, 1)'
+                }
+            });*/
+
+
+
+
 
             mapboxGlMap.addSource('aughts05classes', {
                 type: 'geojson',
@@ -299,7 +321,7 @@ export const MapboxGLMap = ({
                         '<h4> Shape Area: ' + Math.round(e.features[0].properties.Shape_Area) + '</h4>')
                     .addTo(mapboxGlMap);
 
-                //Zoom in
+       /*         //Zoom in
                 const coordinates = e.features[0].geometry.coordinates[0];
                 const bounds = coordinates.reduce(function (bounds, coord) {
                     return bounds.extend(coord);
@@ -308,7 +330,7 @@ export const MapboxGLMap = ({
 
                 mapboxGlMap.fitBounds(bounds, {
                     padding: 100
-                });
+                });*/
 
                 //color bounds
                 mapboxGlMap.setPaintProperty('aoi-highlight', 'line-color', [
@@ -382,6 +404,10 @@ export const MapboxGLMap = ({
                 'fill-opacity',
                 parseInt(`${sliderValueA}`, 10) / 100
             );
+            if (toTop != null) {
+                statefulMap.moveLayer(toTop,'aoi-solid-line');
+            }
+
 
             statefulMap.setLayoutProperty('S2-layer', 'visibility', `${visibilityB}`)
             statefulMap.setPaintProperty(
@@ -397,12 +423,14 @@ export const MapboxGLMap = ({
                 parseInt(`${sliderValueC}`, 10) / 100
             );
 
+
             statefulMap.setLayoutProperty('aughts10classes', 'visibility', `${visibilityD}`)
             statefulMap.setPaintProperty(
                 'aughts10classes',
                 'fill-opacity',
                 parseInt(`${sliderValueD}`, 10) / 100
             );
+
 
             statefulMap.setLayoutProperty('aughts15classes', 'visibility', `${visibilityE}`)
             statefulMap.setPaintProperty(
@@ -411,12 +439,15 @@ export const MapboxGLMap = ({
                 parseInt(`${sliderValueE}`, 10) / 100
             );
 
+
             statefulMap.setLayoutProperty('aughts20classes', 'visibility', `${visibilityF}`)
             statefulMap.setPaintProperty(
                 'aughts20classes',
                 'fill-opacity',
                 parseInt(`${sliderValueF}`, 10) / 100
             );
+
+
 
 
         }
@@ -434,6 +465,7 @@ export const MapboxGLMap = ({
         sliderValueD,
         sliderValueE,
         sliderValueF,
+        toTop
 
     ])
 
@@ -461,17 +493,8 @@ export const MapboxGLMap = ({
 
               {(
                   visibilityD === 'visible' ||
-                  visibilityE === 'visible') ?
-
-                  <Legend
-                      legendLayerTitle={'Land Cover Type'}
-                      itemArray={landClassLegend}/>
-                  :
-                  null
-              }
-
-
-              {(visibilityC === 'visible' ||
+                  visibilityE === 'visible' ||
+                  visibilityC === 'visible' ||
                   visibilityF === 'visible') ?
 
                   <Legend
@@ -481,10 +504,11 @@ export const MapboxGLMap = ({
                   null
               }
 
+
           </div>
 
           <Menu customBurgerIcon={ <FiLayers /> } isOpen={ true } noOverlay={true}>
-                  <Accordion title="Primary Layers" >
+                  <Accordion title="Primary Layers">
 
                           <Layer
                               layerTitle={'ECL Tracts'}
@@ -501,6 +525,9 @@ export const MapboxGLMap = ({
                               }}
                               onSliderChange={(e) => setSliderValueA(e.target.value)}
                               sliderChangeValue={sliderValueA}
+                              layerToTop={ () => {
+                                  setToTop('aoi-solid-fill')
+                              }}
                           />
 
                       <Layer
@@ -518,6 +545,9 @@ export const MapboxGLMap = ({
                           }}
                           onSliderChange={(e) => setSliderValueB(e.target.value)}
                           sliderChangeValue={sliderValueB}
+                          layerToTop={ () => {
+                              setToTop('S2-layer')
+                          }}
                       />
                   </Accordion>
 
@@ -537,6 +567,9 @@ export const MapboxGLMap = ({
                       }}
                       onSliderChange={(e) => setSliderValueC(e.target.value)}
                       sliderChangeValue={sliderValueC}
+                      layerToTop={ () => {
+                          setToTop('aughts05classes')
+                      }}
                   />
 
                   <Layer
@@ -554,6 +587,9 @@ export const MapboxGLMap = ({
                       }}
                       onSliderChange={(e) => setSliderValueD(e.target.value)}
                       sliderChangeValue={sliderValueD}
+                      layerToTop={ () => {
+                          setToTop('aughts10classes')
+                      }}
                   />
 
                   <Layer
@@ -571,6 +607,9 @@ export const MapboxGLMap = ({
                       }}
                       onSliderChange={(e) => setSliderValueE(e.target.value)}
                       sliderChangeValue={sliderValueE}
+                      layerToTop={ () => {
+                          setToTop('aughts15classes')
+                      }}
                   />
 
                   <Layer
@@ -588,6 +627,9 @@ export const MapboxGLMap = ({
                       }}
                       onSliderChange={(e) => setSliderValueF(e.target.value)}
                       sliderChangeValue={sliderValueF}
+                      layerToTop={ () => {
+                          setToTop('aughts20classes')
+                      }}
                   />
 
               </Accordion>
