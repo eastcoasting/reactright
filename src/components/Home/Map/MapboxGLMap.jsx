@@ -4,9 +4,6 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Menu from 'react-burger-menu/lib/menus/slide'
 import { FiLayers } from 'react-icons/fi';
 
-import siteSelection from '../Plot/Data/siteSelection.json'
-import qualifiedOpportunityZones from '../Plot/Data/qualifiedOpportunityZones.json'
-import newMarketTaxCredits from '../Plot/Data/newMarketTaxCredits.json'
 
 import "../toggleStyles.css"
 import "./sidebarStyles.css"
@@ -198,31 +195,48 @@ export const MapboxGLMap = ({
 
 
 
+            mapboxGlMap.addSource('newMarketTaxCredits', {
+                type: 'geojson',
+                data: 'https://raw.githubusercontent.com/eastcoasting/test/master/newMarketTaxCredits.json'
+            });
 
 
 
-
-            ///How to serve ESRI REST DATA
-            /*mapboxGlMap.addLayer({
-                'id': 'parks-layer',
-                'type': 'fill',
-                'source': {
-                    'type': 'geojson',
-                    'data': 'https://services2.arcgis.com/YnuAMVoynZj0G4sm/ArcGIS/rest/services/stands_gdb/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryPolygon&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token='
-
-},
-                'paint': {
-                    'fill-color': 'rgba(200, 100, 240, 0.5)',
-                    'fill-outline-color': 'rgba(200, 100, 240, 1)'
+            mapboxGlMap.addLayer({
+                id: 'newMarketTaxCredits',
+                source: 'newMarketTaxCredits',
+                sourceLayer: 'newMarketTaxCredits-layer',
+                type: 'fill',
+                paint: {
+                    'fill-color': 'rgb(67,20,12)',
+                    'fill-outline-color': 'rgb(34,15,6)'
                 }
-            });*/
+            })
+
+            mapboxGlMap.addSource('qualifiedOpportunityZones', {
+                type: 'geojson',
+                data: 'https://raw.githubusercontent.com/eastcoasting/test/master/qualifiedOpportunityZones.json'
+            });
+
+
+
+            mapboxGlMap.addLayer({
+                id: 'qualifiedOpportunityZones',
+                source: 'qualifiedOpportunityZones',
+                sourceLayer: 'qualifiedOpportunityZones-layer',
+                type: 'fill',
+                paint: {
+                    'fill-color': 'rgb(12,67,21)',
+                    'fill-outline-color': 'rgb(6,34,11)'
+                }
+            });
 
 
 
 
             mapboxGlMap.addSource('siteSelection', {
                 type: 'geojson',
-                data: siteSelection
+                data: 'https://raw.githubusercontent.com/eastcoasting/test/master/siteSelection.json'
             });
 
 
@@ -255,41 +269,6 @@ export const MapboxGLMap = ({
 
 
 
-            mapboxGlMap.addSource('qualifiedOpportunityZones', {
-                type: 'geojson',
-                data: qualifiedOpportunityZones
-            });
-
-
-
-            mapboxGlMap.addLayer({
-                id: 'qualifiedOpportunityZones',
-                source: 'qualifiedOpportunityZones',
-                sourceLayer: 'qualifiedOpportunityZones-layer',
-                type: 'fill',
-                paint: {
-                    'fill-color': 'rgb(12,67,21)',
-                    'fill-outline-color': 'rgb(6,34,11)'
-                }
-            })
-
-            mapboxGlMap.addSource('newMarketTaxCredits', {
-                type: 'geojson',
-                data: newMarketTaxCredits
-            });
-
-
-
-            mapboxGlMap.addLayer({
-                id: 'newMarketTaxCredits',
-                source: 'newMarketTaxCredits',
-                sourceLayer: 'newMarketTaxCredits-layer',
-                type: 'fill',
-                paint: {
-                    'fill-color': 'rgb(67,20,12)',
-                    'fill-outline-color': 'rgb(34,15,6)'
-                }
-            })
 
 
 
@@ -487,12 +466,14 @@ export const MapboxGLMap = ({
         visibilityD,
         visibilityE,
         visibilityF,
+        visibilityG,
         sliderValueA,
         sliderValueB,
         sliderValueC,
         sliderValueD,
         sliderValueE,
         sliderValueF,
+        sliderValueG,
         toTop
 
     ])
@@ -540,7 +521,9 @@ export const MapboxGLMap = ({
           </div>
 
           <Menu customBurgerIcon={ <FiLayers /> } isOpen={ true } noOverlay={true}>
-                  <Accordion title="Environment">
+                  <Accordion title="Environment"
+                             accordionOpen={false}
+                  >
 
                           <Layer
                               layerTitle={'Vernal Pools'}
@@ -583,7 +566,9 @@ export const MapboxGLMap = ({
                       />
                   </Accordion>
 
-              <Accordion title="Land Classification">
+              <Accordion title="Woodbasket"
+                         accordionOpen={false}
+              >
                   <Layer
                       layerTitle={'Conserved Lands'}
                       sourceDetails={'https://maine.hub.arcgis.com/datasets/a6797f12a07b4229bc2501d3741c98d4'}
@@ -605,6 +590,32 @@ export const MapboxGLMap = ({
                   />
 
                   <Layer
+                      layerTitle={'Forest Ownership'}
+                      sourceDetails={'https://usfs.maps.arcgis.com/home/item.html?id=0cc2cb942455475ca781fda25028ef2f'}
+                      layerDescription={'The data are designed for strategic analyses at a national or regional scale which require spatially explicit information regarding the extent, distribution, and prevalence of the ownership types represented. The data are not recommended for tactical analyses on a sub-regional scale, or for informing local management decisions. Furthermore, map accuracies vary considerably and thus the utility of these data can vary geographically under different ownership patterns.'}
+                      defaultChecked={false}
+                      onToggleChange={ (e) => {
+                          if(e.target.checked === false) {
+                              setVisibilityE('none')
+                          }
+                          else {
+                              setVisibilityE('visible')
+                          }
+                      }}
+                      onSliderChange={(e) => setSliderValueE(e.target.value)}
+                      sliderChangeValue={sliderValueE}
+                      layerToTop={ () => {
+                          setToTop('landOwnership')
+                      }}
+                  />
+
+              </Accordion>
+
+              <Accordion title="Maine's Forest Economy"
+                         accordionOpen={true}
+              >
+
+                  <Layer
                       layerTitle={'Brownfield Sites'}
                       sourceDetails={'Indufor 2020'}
                       layerDescription={'2010 Classes'}
@@ -621,26 +632,6 @@ export const MapboxGLMap = ({
                       sliderChangeValue={sliderValueD}
                       layerToTop={ () => {
                           setToTop('siteSelection')
-                      }}
-                  />
-
-                  <Layer
-                      layerTitle={'Forest Ownership'}
-                      sourceDetails={'https://apps.fs.usda.gov/arcx/rest/services/RDW_AdminAndOwnership/PublicPrivateForestOwnership_CONUS/MapServer'}
-                      layerDescription={'The data are designed for strategic analyses at a national or regional scale which require spatially explicit information regarding the extent, distribution, and prevalence of the ownership types represented. The data are not recommended for tactical analyses on a sub-regional scale, or for informing local management decisions. Furthermore, map accuracies vary considerably and thus the utility of these data can vary geographically under different ownership patterns.'}
-                      defaultChecked={false}
-                      onToggleChange={ (e) => {
-                          if(e.target.checked === false) {
-                              setVisibilityE('none')
-                          }
-                          else {
-                              setVisibilityE('visible')
-                          }
-                      }}
-                      onSliderChange={(e) => setSliderValueE(e.target.value)}
-                      sliderChangeValue={sliderValueE}
-                      layerToTop={ () => {
-                          setToTop('landOwnership')
                       }}
                   />
 
@@ -677,8 +668,8 @@ export const MapboxGLMap = ({
                               setVisibilityG('visible')
                           }
                       }}
-                      onSliderChange={(e) => setSliderValueF(e.target.value)}
-                      sliderChangeValue={sliderValueF}
+                      onSliderChange={(e) => setSliderValueG(e.target.value)}
+                      sliderChangeValue={sliderValueG}
                       layerToTop={ () => {
                           setToTop('newMarketTaxCredits')
                       }}

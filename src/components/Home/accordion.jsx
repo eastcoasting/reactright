@@ -3,10 +3,10 @@ import './accordionStyles.scss';
 
 
 
-const Accordion = ({ title, children }) => {
+const Accordion = ({ title, children, accordionOpen }) => {
 
 
-    const [isOpen, setOpen] = React.useState(true);
+    const [isOpen, setOpen] = React.useState(accordionOpen);
     return (
         <div className="accordion-wrapper">
 

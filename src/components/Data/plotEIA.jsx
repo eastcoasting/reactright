@@ -1,22 +1,82 @@
 import React, {useRef, useState} from "react";
-import {ECL_data} from "./Data/data";
 import Plotly from "plotly.js"
 import Select from 'react-select'
-import Collapsible from 'react-collapsible';
-import { AiOutlineLineChart } from 'react-icons/ai';
 
 import createPlotlyComponent from 'react-plotly.js/factory';
+import {useQuery} from "react-query";
 
 
 const Plot = createPlotlyComponent(Plotly);
 
 
-export const PlotlyBarComponent = ({
+
+export const PlotEIA = ({
                                  heightP,
                                  widthP,
                                  barColorInput,
                                  onClick
                              }) => {
+
+    const Xvalues = [];
+
+
+    const {  data } = useQuery("repoData", () =>
+        fetch(
+            "https://api.eia.gov/series/?api_key=84b2ffa162be7397b1aa46838f3f89bb&series_id=ELEC.PRICE.ME-ALL.Q"
+        ).then((res) => res.json()
+            .then(
+                function(data) {
+                    console.log(data.series[0]);
+
+         /*           for (var key in data.series[0].data) {
+                        Xvalues.push(key);
+
+
+                         console.log(Xvalues)
+                    }*/
+
+                    const data2 = data.series[0].data
+
+                    let rows = data2.length
+                    /*console.log(rows)
+                    console.log(data2)
+*/
+                    for(let i=0; i<rows; i++){
+                        let items = data2[i].length;
+                        /*console.log(data2)*/
+                        console.log(items);
+
+                        for(let n=0; n<items; n++){
+                            Xvalues.push(data2[i][n]);
+/*
+                            console.log(Xvalues);
+*/
+
+
+                        }
+                    }
+
+
+
+                }
+
+            )
+
+        )
+    );
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     const dataChartNode = useRef();
@@ -37,8 +97,8 @@ export const PlotlyBarComponent = ({
 
     const chartData = [
         {
-            x: [ECL_data()[0].id, ECL_data()[1].id, ECL_data()[2].id, ECL_data()[3].id, ECL_data()[4].id, ECL_data()[5].id, ECL_data()[6].id, ECL_data()[7].id, ECL_data()[8].id, ECL_data()[8].id, ECL_data()[9].id, ECL_data()[10].id, ECL_data()[11].id, ECL_data()[12].id, ECL_data()[13].id, ECL_data()[14].id, ECL_data()[15].id, ECL_data()[16].id, ECL_data()[17].id, ECL_data()[18].id, ECL_data()[19].id, ECL_data()[20].id, ECL_data()[21].id, ECL_data()[22].id, ECL_data()[23].id, ECL_data()[24].id],
-            y: [ECL_data()[0].count, ECL_data()[1].count, ECL_data()[2].count, ECL_data()[3].count, ECL_data()[4].count, ECL_data()[5].count, ECL_data()[6].count, ECL_data()[7].count, ECL_data()[8].count, ECL_data()[9].count, ECL_data()[10].count, ECL_data()[11].count, ECL_data()[12].count, ECL_data()[13].count, ECL_data()[14].count, ECL_data()[15].count, ECL_data()[16].count, ECL_data()[17].count, ECL_data()[18].count, ECL_data()[19].count, ECL_data()[20].count, ECL_data()[21].count, ECL_data()[22].count, ECL_data()[23].count, ECL_data()[24].count],
+            x: [1],
+            y: [2],
             type: `${myForm.mySelectKey}`,
             marker: {color: barColorInput},
             showlegend: true,
@@ -52,11 +112,6 @@ export const PlotlyBarComponent = ({
     return (
 
         <div className={"plot"} >
-            <Collapsible  trigger={<AiOutlineLineChart
-                          className={'chartIcon'}
-                          size="40px" />}
-                          open ={false}
-            >
 
            <div className={"toggle"} style={{width: '150px'}}>
                <Select
@@ -68,6 +123,24 @@ export const PlotlyBarComponent = ({
                    options={options}
                />
            </div>
+
+            <div className="col-lg-5">
+
+                {status === 'error' && (
+                    <div>Error fetching data</div>
+                )}
+
+                {status === 'loading' && (
+                    <div>Loading data...</div>
+                )}
+
+             {/*   {status === 'success' && (
+                    <div>
+                        {data.series.map(EIA => <div>{EIA.data}</div>)}
+                    </div>
+                )}*/}
+
+            </div>
 
         <Plot
             ref={dataChartNode}
@@ -105,9 +178,10 @@ export const PlotlyBarComponent = ({
                 // scrollZoom,
                 showTips: false
             }}
+/*
             onClick={onClick}
+*/
         />
-            </Collapsible>
         </div>
 
 
