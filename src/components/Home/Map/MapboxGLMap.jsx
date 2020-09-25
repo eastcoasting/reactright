@@ -1,9 +1,12 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Menu from 'react-burger-menu/lib/menus/slide'
 import { FiLayers } from 'react-icons/fi';
 
+import siteSelection from '../Plot/Data/siteSelection.json'
+import qualifiedOpportunityZones from '../Plot/Data/qualifiedOpportunityZones.json'
+import newMarketTaxCredits from '../Plot/Data/newMarketTaxCredits.json'
 
 import "../toggleStyles.css"
 import "./sidebarStyles.css"
@@ -12,7 +15,6 @@ import "./legendStyle.css"
 import Accordion from "../accordion";
 import Layer from "./layer";
 import Legend from "./Legend";
-
 
 
 const styles = {
@@ -41,37 +43,35 @@ export const MapboxGLMap = ({
     const [ toTop, setToTop]= useState(null)
 
 
-    const [ visibilityB, setVisibilityB]= useState('visible')
+    const [ visibilityB, setVisibilityB]= useState('none')
     const [ sliderValueB, setSliderValueB ] = useState(100);
 
 
     const [ visibilityC, setVisibilityC]= useState('none')
     const [ sliderValueC, setSliderValueC ] = useState(100);
 
-    const [ visibilityD, setVisibilityD]= useState('none')
+    const [ visibilityD, setVisibilityD]= useState('visible')
     const [ sliderValueD, setSliderValueD ] = useState(100);
 
     const [ visibilityE, setVisibilityE]= useState('none')
     const [ sliderValueE, setSliderValueE ] = useState(100);
 
-    const [ visibilityF, setVisibilityF]= useState('visible')
+    const [ visibilityF, setVisibilityF]= useState('none')
     const [ sliderValueF, setSliderValueF ] = useState(100);
 
-    const landClassStyles = ['native forest',
-        '#668823',
-        'scrub',
-        '#640b2a',
-        'grass',
-        '#AADECC',
-        'crop',
-        '#FADD45',
-        'water',
-        '#5567AA',
-        'planation',
-        '#307633',
-        'urban',
-        '#BB0111',
-        /* other */ '#cccccc']
+    const [ visibilityG, setVisibilityG]= useState('none')
+    const [ sliderValueG, setSliderValueG ] = useState(100);
+
+    const landClassStyles = ['BioMass',
+        '#fbb03b',
+        'Paper Mill',
+        '#223b53',
+        'Multi Use',
+        '#e55e5e',
+        'Saw Mill',
+        '#3bb2d0',
+        'Unspecified',
+        '#ccc']
 
 
     const landClassLegend = landClassStyles.reduce(function(result, value, index, array) {
@@ -127,13 +127,13 @@ export const MapboxGLMap = ({
 
     const initMap = () => {
 
-        mapboxgl.accessToken = 'pk.eyJ1Ijoid2lsbGNhcnRlciIsImEiOiJjamV4b2g3Z2ExOGF4MzFwN3R1dHJ3d2J4In0.Ti-hnuBH8W4bHn7k6GCpGw'
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZGFuc3dpY2siLCJhIjoiY2l1dTUzcmgxMDJ0djJ0b2VhY2sxNXBiMyJ9.25Qs4HNEkHubd4_Awbd8Og'
 
         const mapboxGlMap = new mapboxgl.Map({
             container: mapContainer.current,
             style: `mapbox://styles/mapbox/outdoors-v11`,
-            center: [107, 13],
-            zoom: 8
+            center: [-69.445500, 45.25380],
+            zoom: 6.5
         })
 
         mapboxGlMap.addControl(new mapboxgl.NavigationControl())
@@ -141,34 +141,66 @@ export const MapboxGLMap = ({
 
         mapboxGlMap.on("load", () => {
 
-            mapboxGlMap.addSource("S2-source", {
-                type: 'raster',
-                tiles: [
-                    'https://storage.googleapis.com/indufor-application-assets/Cambodia-ESG/True-Colour-S2/{z}/{x}/{y}'],
-                tileSize: 256
-            });
-            // now add the layer, and reference the data source above by name
+
             mapboxGlMap.addLayer({
-                id: "S2-layer",
-                type: 'raster',
-                source: "S2-source",
-                paint: {},
+                id: "satellite",
+                source: {"type": "raster",  "url": "mapbox://mapbox.satellite", "tileSize": 256},
+                type: "raster",
             });
 
-            mapboxGlMap.addSource('aoi', {
+            mapboxGlMap.addSource('vernalPools', {
                 type: 'geojson',
-                data
+                data: 'https://services1.arcgis.com/RbMX0mRVOFNTdLzd/arcgis/rest/services/SVP/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson'
             });
 
-            if (colorBreaks) {
+
                 mapboxGlMap.addLayer({
-                    id: 'aoi-solid-fill',
-                    source: 'aoi',
-                    sourceLayer: 'aoi-source-layer',
+                    id: 'vernalPools',
+                    source: 'vernalPools',
+                    sourceLayer: 'vernalPools-source-layer',
                     type: 'fill',
-                    paint: {'fill-color': getFillColor(colorBreaks)}
+                    paint: {
+                        'fill-color': 'rgba(200, 100, 240, 0.5)',
+                        'fill-outline-color': 'rgba(200, 100, 240, 1)'
+                    }
                 })
-            }
+
+
+            mapboxGlMap.addSource('conservedAreas', {
+                type: 'geojson',
+                data: 'https://gis.maine.gov/arcgis/rest/services/acf/Conserved_Lands/MapServer/0/query?outFields=*&where=1%3D1&f=geojson'
+            });
+
+
+            mapboxGlMap.addLayer({
+                id: 'conservedAreas',
+                source: 'conservedAreas',
+                sourceLayer: 'conservedAreas-source-layer',
+                type: 'fill',
+                paint: {
+                    'fill-color': 'rgba(200, 100, 240, 0.5)',
+                    'fill-outline-color': 'rgba(200, 100, 240, 1)'
+                }
+            })
+
+
+            mapboxGlMap.addLayer({
+                "id": "landOwnership",
+                "type": "raster",
+                "minzoom": 0,
+                "maxzoom": 22,
+                "source": {
+                    "type": "raster",
+                    "tiles": ['https://apps.fs.usda.gov/arcx/rest/services/RDW_AdminAndOwnership/PublicPrivateForestOwnership_CONUS/MapServer/export?bbox={bbox-epsg-3857}&bboxSR=EPSG%3A3857&dpi=96&format=png32&transparent=true&layers=show%3A0&f=image'],
+                    "tileSize": 256
+                }
+            });
+
+
+
+
+
+
 
             ///How to serve ESRI REST DATA
             /*mapboxGlMap.addLayer({
@@ -188,98 +220,87 @@ export const MapboxGLMap = ({
 
 
 
-
-            mapboxGlMap.addSource('aughts05classes', {
+            mapboxGlMap.addSource('siteSelection', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/eastcoasting/test/master/aughts05classes.json'
+                data: siteSelection
             });
 
-            ///https://waterdata.usgs.gov/blog/tolcolors/
+
+
             mapboxGlMap.addLayer({
-                id: 'aughts05classes',
-                source: 'aughts05classes',
-                type: 'fill',
-                paint: {
-                    'fill-opacity': 0.7,
-                    'fill-color': [
+                id: 'siteSelection',
+                source: 'siteSelection',
+                type: 'circle',
+                'paint': {
+                    'circle-radius': {
+                        'base': 1.75,
+                        'stops': [[12, 10], [22, 180]]
+
+                    },
+                    'circle-color': [
                         'match',
-                        ['get', 'F2005'],
-                        ...landClassStyles
+                        ['get', 'SiteType'],
+                        'BioMass',
+                        '#fbb03b',
+                        'Paper Mill',
+                        '#223b53',
+                        'Multi Use',
+                        '#e55e5e',
+                        'Saw Mill',
+                        '#3bb2d0',
+                        '#ccc'
                     ]
                 }
-
             });
 
-            mapboxGlMap.addSource('aughts10classes', {
+
+
+            mapboxGlMap.addSource('qualifiedOpportunityZones', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/eastcoasting/test/master/aughts10classes.json'
+                data: qualifiedOpportunityZones
             });
 
-            ///https://waterdata.usgs.gov/blog/tolcolors/
+
+
             mapboxGlMap.addLayer({
-                id: 'aughts10classes',
-                source: 'aughts10classes',
+                id: 'qualifiedOpportunityZones',
+                source: 'qualifiedOpportunityZones',
+                sourceLayer: 'qualifiedOpportunityZones-layer',
                 type: 'fill',
                 paint: {
-                    'fill-opacity': 0.7,
-                    'fill-color': [
-                        'match',
-                        ['get', 'F2010'],
-                        ...landClassStyles
-                    ]
+                    'fill-color': 'rgb(12,67,21)',
+                    'fill-outline-color': 'rgb(6,34,11)'
                 }
+            })
 
-            });
-
-            mapboxGlMap.addSource('aughts15classes', {
+            mapboxGlMap.addSource('newMarketTaxCredits', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/eastcoasting/test/master/aughts15classes.json'
+                data: newMarketTaxCredits
             });
 
-            ///https://waterdata.usgs.gov/blog/tolcolors/
+
+
             mapboxGlMap.addLayer({
-                id: 'aughts15classes',
-                source: 'aughts15classes',
+                id: 'newMarketTaxCredits',
+                source: 'newMarketTaxCredits',
+                sourceLayer: 'newMarketTaxCredits-layer',
                 type: 'fill',
                 paint: {
-                    'fill-opacity': 0.7,
-                    'fill-color': [
-                        'match',
-                        ['get', 'F2015'],
-                        ...landClassStyles
-                    ]
+                    'fill-color': 'rgb(67,20,12)',
+                    'fill-outline-color': 'rgb(34,15,6)'
                 }
-
-            });
-
-            mapboxGlMap.addSource('aughts20classes', {
-                type: 'geojson',
-                data: 'https://raw.githubusercontent.com/eastcoasting/test/master/aughts20classes.json'
-            });
+            })
 
 
 
 
-            ///https://waterdata.usgs.gov/blog/tolcolors/
-            mapboxGlMap.addLayer({
-                id: 'aughts20classes',
-                source: 'aughts20classes',
-                type: 'fill',
-                paint: {
-                    'fill-opacity': 0.7,
-                    'fill-color': [
-                        'match',
-                        ['get', 'F2020'],
-                        ...landClassStyles
-                    ]
-                }
-
-            });
 
 
-            mapboxGlMap.addLayer({
+
+
+            /*mapboxGlMap.addLayer({
                 id: 'aoi-solid-line',
-                source: 'aoi',
+                source: 'conservedAreas',
                 type: 'line',
                 paint: {
                     'line-color': 'white',
@@ -290,29 +311,29 @@ export const MapboxGLMap = ({
             //lay down a transparent highlight line layer, we'll use this layer later to highlight a feature based on selectedId
             mapboxGlMap.addLayer({
                 id: 'aoi-highlight',
-                source: 'aoi',
+                source: 'conservedAreas',
                 type: 'line',
                 paint: {
                     'line-color': `rgba(${highlightLineColor.rgba[0]},${highlightLineColor.rgba[1]},${highlightLineColor.rgba[2]}, 0)`,
                     'line-width': 3,
                 }
-            })
+            })*/
 
 
             ///////////////////////////////////////////////////////////
 
             // Change the cursor to a pointer when the mouse is over the layer.
-            mapboxGlMap.on('mouseenter', 'aoi-solid-fill', function () {
+            mapboxGlMap.on('mouseenter', 'vernalPools', function () {
                 mapboxGlMap.getCanvas().style.cursor = 'pointer';
             });
 
             // Change it back to a pointer when it leaves.
-            mapboxGlMap.on('mouseleave', 'aoi-solid-fill', function () {
+            mapboxGlMap.on('mouseleave', 'vernalPools', function () {
                 mapboxGlMap.getCanvas().style.cursor = '';
             });
 
             // When AOI is clicked
-            mapboxGlMap.on('click', 'aoi-solid-fill', function (e) {
+            mapboxGlMap.on('click', 'vernalPools', function (e) {
                 //Popup
                 new mapboxgl.Popup()
                     .setLngLat(e.lngLat)
@@ -333,12 +354,12 @@ export const MapboxGLMap = ({
                 });*/
 
                 //color bounds
-                mapboxGlMap.setPaintProperty('aoi-highlight', 'line-color', [
-                    'case',
-                    ['==', ['get', 'id'], e.features[0].properties.id],
-                    `rgba(${highlightLineColor.rgba[0]},${highlightLineColor.rgba[1]},${highlightLineColor.rgba[2]},${highlightLineColor.rgba[3]})`,
-                    'rgba(0,0,0,0)'
-                ]);
+                // mapboxGlMap.setPaintProperty('aoi-highlight', 'line-color', [
+                //     'case',
+                //     ['==', ['get', 'id'], e.features[0].properties.id],
+                //     `rgba(${highlightLineColor.rgba[0]},${highlightLineColor.rgba[1]},${highlightLineColor.rgba[2]},${highlightLineColor.rgba[3]})`,
+                //     'rgba(0,0,0,0)'
+                // ]);
 
             });
 
@@ -362,27 +383,27 @@ export const MapboxGLMap = ({
 
 
             if (getSelectedID()) {
-                console.log(`selectedId is not null, highlight selectedId: ${getSelectedID()}`)
-                statefulMap.setPaintProperty('aoi-highlight', 'line-color', [
-                    'case',
-                    ['==', ['get', 'id'], parseInt(getSelectedID())],
-                    `rgba(${highlightLineColor.rgba[0]},${highlightLineColor.rgba[1]},${highlightLineColor.rgba[2]},${highlightLineColor.rgba[3]})`,
-                    'rgba(0,0,0,0)'
-                ]);
-
-                const aoiFeatures = data.features.filter(feature => feature.properties.id === parseInt(getSelectedID()));
-                const coordinates = (aoiFeatures[0].geometry.coordinates[0][0]);
-                const bounds = coordinates.reduce(function (bounds, coord) {
-                    return bounds.extend(coord);
-                }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
-                statefulMap.fitBounds(bounds, {
-                    padding: 100
-                });
-
-            } else {
-                statefulMap.setPaintProperty('aoi-highlight', 'line-color', 'rgba(0,0,0,0)')
-                statefulMap.flyTo({center: [107, 13], zoom: 8});
-            }
+            //     console.log(`selectedId is not null, highlight selectedId: ${getSelectedID()}`)
+            //     statefulMap.setPaintProperty('aoi-highlight', 'line-color', [
+            //         'case',
+            //         ['==', ['get', 'id'], parseInt(getSelectedID())],
+            //         `rgba(${highlightLineColor.rgba[0]},${highlightLineColor.rgba[1]},${highlightLineColor.rgba[2]},${highlightLineColor.rgba[3]})`,
+            //         'rgba(0,0,0,0)'
+            //     ]);
+            //
+            //     const aoiFeatures = data.features.filter(feature => feature.properties.id === parseInt(getSelectedID()));
+            //     const coordinates = (aoiFeatures[0].geometry.coordinates[0][0]);
+            //     const bounds = coordinates.reduce(function (bounds, coord) {
+            //         return bounds.extend(coord);
+            //     }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+            //     statefulMap.fitBounds(bounds, {
+            //         padding: 100
+            //     });
+            //
+            // } else {
+            //     statefulMap.setPaintProperty('aoi-highlight', 'line-color', 'rgba(0,0,0,0)')
+            //     statefulMap.flyTo({center: [-69.445500, 45.25380], zoom: 6.5});
+             }
 
         }
 
@@ -398,53 +419,60 @@ export const MapboxGLMap = ({
         if (!statefulMap) {
         } else {
 
-            statefulMap.setLayoutProperty('aoi-solid-fill', 'visibility', `${visibilityA}`)
+            statefulMap.setLayoutProperty('vernalPools', 'visibility', `${visibilityA}`)
             statefulMap.setPaintProperty(
-                'aoi-solid-fill',
+                'vernalPools',
                 'fill-opacity',
                 parseInt(`${sliderValueA}`, 10) / 100
             );
             if (toTop != null) {
-                statefulMap.moveLayer(toTop,'aoi-solid-line');
+                statefulMap.moveLayer(toTop);
             }
 
 
-            statefulMap.setLayoutProperty('S2-layer', 'visibility', `${visibilityB}`)
+            statefulMap.setLayoutProperty('satellite', 'visibility', `${visibilityB}`)
             statefulMap.setPaintProperty(
-                'S2-layer',
+                'satellite',
                 'raster-opacity',
                 parseInt(`${sliderValueB}`, 10) / 100
             );
 
-            statefulMap.setLayoutProperty('aughts05classes', 'visibility', `${visibilityC}`)
+            statefulMap.setLayoutProperty('conservedAreas', 'visibility', `${visibilityC}`)
             statefulMap.setPaintProperty(
-                'aughts05classes',
+                'conservedAreas',
                 'fill-opacity',
                 parseInt(`${sliderValueC}`, 10) / 100
             );
 
 
-            statefulMap.setLayoutProperty('aughts10classes', 'visibility', `${visibilityD}`)
+            statefulMap.setLayoutProperty('siteSelection', 'visibility', `${visibilityD}`)
             statefulMap.setPaintProperty(
-                'aughts10classes',
-                'fill-opacity',
+                'siteSelection',
+                'circle-opacity',
                 parseInt(`${sliderValueD}`, 10) / 100
             );
 
 
-            statefulMap.setLayoutProperty('aughts15classes', 'visibility', `${visibilityE}`)
+            statefulMap.setLayoutProperty('landOwnership', 'visibility', `${visibilityE}`)
             statefulMap.setPaintProperty(
-                'aughts15classes',
-                'fill-opacity',
+                'landOwnership',
+                'raster-opacity',
                 parseInt(`${sliderValueE}`, 10) / 100
             );
 
 
-            statefulMap.setLayoutProperty('aughts20classes', 'visibility', `${visibilityF}`)
+            statefulMap.setLayoutProperty('qualifiedOpportunityZones', 'visibility', `${visibilityF}`)
             statefulMap.setPaintProperty(
-                'aughts20classes',
+                'qualifiedOpportunityZones',
                 'fill-opacity',
                 parseInt(`${sliderValueF}`, 10) / 100
+            );
+
+            statefulMap.setLayoutProperty('newMarketTaxCredits', 'visibility', `${visibilityG}`)
+            statefulMap.setPaintProperty(
+                'newMarketTaxCredits',
+                'fill-opacity',
+                parseInt(`${sliderValueG}`, 10) / 100
             );
 
 
@@ -483,9 +511,11 @@ export const MapboxGLMap = ({
               {(visibilityA === 'visible') ?
 
                   <Legend
-                      legendLayerTitle={'ECL Tracts'}
+                      legendLayerTitle={'Vernal Pools'}
                       itemArray={ECLBreaksLegend}
-                      legendLayerFormat={'Area in m2'}/>
+                      legendLayerFormat={'Area in m2'}
+                      keyID={'vernalPools'}
+                  />
                   :
                   null
               }
@@ -498,8 +528,10 @@ export const MapboxGLMap = ({
                   visibilityF === 'visible') ?
 
                   <Legend
-                      legendLayerTitle={'Land Cover Type'}
-                      itemArray={landClassLegend}/>
+                      legendLayerTitle={'Brownfield Sites'}
+                      itemArray={landClassLegend}
+                      keyID={'siteSelection'}
+                  />
                   :
                   null
               }
@@ -508,12 +540,12 @@ export const MapboxGLMap = ({
           </div>
 
           <Menu customBurgerIcon={ <FiLayers /> } isOpen={ true } noOverlay={true}>
-                  <Accordion title="Primary Layers">
+                  <Accordion title="Environment">
 
                           <Layer
-                              layerTitle={'ECL Tracts'}
-                              sourceDetails={'Indufor 2020'}
-                              layerDescription={'ECL Tracts'}
+                              layerTitle={'Vernal Pools'}
+                              sourceDetails={'https://maine.hub.arcgis.com/datasets/478a139603884f718651f21c9dbf318c'}
+                              layerDescription={'This dataset was developed in accordance with Maine\'s Natural Resources Protection Act (NRPA). Under this Act, the Maine Department of Inland Fisheries and Wildlife (MDIFW) is designated as the authority for determining Significant Wildlife Habitats (SWHs). This dataset includes all Significant Vernal Pools currently mapped. This dataset depicts 250-foot habitat zones surrounding the perimeters of Significant Vernal Pools (SVPs) or Potentially Significant Vernal Pools (PSVPs). SVPs and PSVPs were mapped and surveyed in the field by Maine Department of Environmental Protection staff, Maine Department of Inland Fisheries and Wildlife biologists, and appropriately trained consultants.'}
                               defaultChecked={false}
                               onToggleChange={ (e) => {
                                   if(e.target.checked === false) {
@@ -526,15 +558,15 @@ export const MapboxGLMap = ({
                               onSliderChange={(e) => setSliderValueA(e.target.value)}
                               sliderChangeValue={sliderValueA}
                               layerToTop={ () => {
-                                  setToTop('aoi-solid-fill')
+                                  setToTop('vernalPools')
                               }}
                           />
 
                       <Layer
-                          layerTitle={'S2 Layer'}
+                          layerTitle={'Satellite'}
                           sourceDetails={'Indufor 2020'}
-                          layerDescription={'S2 Layer'}
-                          defaultChecked={true}
+                          layerDescription={'Mapbox Satellite'}
+                          defaultChecked={false}
                           onToggleChange={ (e) => {
                               if(e.target.checked === false) {
                                   setVisibilityB('none')
@@ -546,16 +578,16 @@ export const MapboxGLMap = ({
                           onSliderChange={(e) => setSliderValueB(e.target.value)}
                           sliderChangeValue={sliderValueB}
                           layerToTop={ () => {
-                              setToTop('S2-layer')
+                              setToTop('satellite')
                           }}
                       />
                   </Accordion>
 
               <Accordion title="Land Classification">
                   <Layer
-                      layerTitle={'2005 Classes'}
-                      sourceDetails={'Indufor 2020'}
-                      layerDescription={'2005 Classes'}
+                      layerTitle={'Conserved Lands'}
+                      sourceDetails={'https://maine.hub.arcgis.com/datasets/a6797f12a07b4229bc2501d3741c98d4'}
+                      layerDescription={'Conserved Lands contains conservation lands ownership boundaries at 1:24,000 scale for Maine land in federal, state, municipal and non-profit ownership with easements. State, county, town, and coast boundary data were obtained from MEGIS town boundary dataset METWP24. 1:24,000 US Geological Survey (USGS) digital line graph data was used for hydrography and transportation features. Where state, county, and town boundaries were coincident with property boundaries, the coincident features were taken from METWP24. Where hydrography, roads, railroads and power-lines were coincident with property boundaries, the coincident features were taken from 1:24,000 digital line graph data. The ownership lines do not represent legal boundaries nor are the ownership lines a survey. Conserved Lands is an inventory of approximate property boundaries.'}
                       defaultChecked={false}
                       onToggleChange={ (e) => {
                           if(e.target.checked === false) {
@@ -568,15 +600,15 @@ export const MapboxGLMap = ({
                       onSliderChange={(e) => setSliderValueC(e.target.value)}
                       sliderChangeValue={sliderValueC}
                       layerToTop={ () => {
-                          setToTop('aughts05classes')
+                          setToTop('conservedAreas')
                       }}
                   />
 
                   <Layer
-                      layerTitle={'2010 Classes'}
+                      layerTitle={'Brownfield Sites'}
                       sourceDetails={'Indufor 2020'}
                       layerDescription={'2010 Classes'}
-                      defaultChecked={false}
+                      defaultChecked={true}
                       onToggleChange={ (e) => {
                           if(e.target.checked === false) {
                               setVisibilityD('none')
@@ -588,14 +620,14 @@ export const MapboxGLMap = ({
                       onSliderChange={(e) => setSliderValueD(e.target.value)}
                       sliderChangeValue={sliderValueD}
                       layerToTop={ () => {
-                          setToTop('aughts10classes')
+                          setToTop('siteSelection')
                       }}
                   />
 
                   <Layer
-                      layerTitle={'2015 Classes'}
-                      sourceDetails={'Indufor 2020'}
-                      layerDescription={'2015 Classes'}
+                      layerTitle={'Forest Ownership'}
+                      sourceDetails={'https://apps.fs.usda.gov/arcx/rest/services/RDW_AdminAndOwnership/PublicPrivateForestOwnership_CONUS/MapServer'}
+                      layerDescription={'The data are designed for strategic analyses at a national or regional scale which require spatially explicit information regarding the extent, distribution, and prevalence of the ownership types represented. The data are not recommended for tactical analyses on a sub-regional scale, or for informing local management decisions. Furthermore, map accuracies vary considerably and thus the utility of these data can vary geographically under different ownership patterns.'}
                       defaultChecked={false}
                       onToggleChange={ (e) => {
                           if(e.target.checked === false) {
@@ -608,15 +640,15 @@ export const MapboxGLMap = ({
                       onSliderChange={(e) => setSliderValueE(e.target.value)}
                       sliderChangeValue={sliderValueE}
                       layerToTop={ () => {
-                          setToTop('aughts15classes')
+                          setToTop('landOwnership')
                       }}
                   />
 
                   <Layer
-                      layerTitle={'2020 Classes'}
-                      sourceDetails={'Indufor 2020'}
-                      layerDescription={'2020 Classes'}
-                      defaultChecked={true}
+                      layerTitle={'Qualified Opportunity Zones'}
+                      sourceDetails={'https://www.maine.gov/decd/business-development/opportunity-zones'}
+                      layerDescription={'The Opportunity Zones incentive is a community investment tool established by Congress in the Tax Cuts and Jobs Act of 2017 to encourage long-term investments in low-income urban and rural communities nationwide. Opportunity Zones provide a tax incentive for investors to re-invest their unrealized capital gains into dedicated Opportunity Funds.'}
+                      defaultChecked={false}
                       onToggleChange={ (e) => {
                           if(e.target.checked === false) {
                               setVisibilityF('none')
@@ -628,7 +660,27 @@ export const MapboxGLMap = ({
                       onSliderChange={(e) => setSliderValueF(e.target.value)}
                       sliderChangeValue={sliderValueF}
                       layerToTop={ () => {
-                          setToTop('aughts20classes')
+                          setToTop('qualifiedOpportunityZones')
+                      }}
+                  />
+
+                  <Layer
+                      layerTitle={'New Market Tax Credit'}
+                      sourceDetails={'https://www.maine.gov/decd/business-development/opportunity-zones'}
+                      layerDescription={'The Opportunity Zones incentive is a community investment tool established by Congress in the Tax Cuts and Jobs Act of 2017 to encourage long-term investments in low-income urban and rural communities nationwide. Opportunity Zones provide a tax incentive for investors to re-invest their unrealized capital gains into dedicated Opportunity Funds.'}
+                      defaultChecked={false}
+                      onToggleChange={ (e) => {
+                          if(e.target.checked === false) {
+                              setVisibilityG('none')
+                          }
+                          else {
+                              setVisibilityG('visible')
+                          }
+                      }}
+                      onSliderChange={(e) => setSliderValueF(e.target.value)}
+                      sliderChangeValue={sliderValueF}
+                      layerToTop={ () => {
+                          setToTop('newMarketTaxCredits')
                       }}
                   />
 

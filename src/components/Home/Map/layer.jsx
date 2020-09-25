@@ -2,7 +2,7 @@ import React, {useState }from "react";
 import Toggle from "react-toggle";
 import {AiOutlineInfoCircle} from "react-icons/ai";
 import Modal from "react-modal";
-import {MdOpacity, MdSwapVert} from "react-icons/md";
+import {MdOpacity} from "react-icons/md";
 
 import './layerStyles.css'
 

@@ -24,7 +24,7 @@ export const Home = () => {
                   heightP={450}
                   widthP={550}
                   onClick={(e) => {
-                      if(e.points[0].x == selectedId) {
+                      if(e.points[0].x === selectedId) {
                           setSelectedId(0);
                       }
                       else{

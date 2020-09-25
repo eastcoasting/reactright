@@ -1,19 +1,3 @@
-.legend {
-    background-color: #fff;
-    position: relative;
-    left: 0;
-    top: 0vh;
-    margin-bottom: 1vh;
-    border-radius: 3px;
-    bottom: 30px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    font: 16px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-    padding: 10px;
-    width: 100%;
-    height: 17vh;
-    z-index: 1;
-}
-
 .legendBox {
     background-color: #c8c8c8;
     position: absolute;
@@ -32,14 +16,69 @@
     z-index: 1;
 }
 
-.legend h4 {
+
+.siteSelection {
+    background-color: #fff;
+    position: relative;
+    left: 0;
+    top: 0vh;
+    margin-bottom: 1vh;
+    border-radius: 3px;
+    bottom: 30px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font: 16px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    padding: 10px;
+    width: 100%;
+    height: 17vh;
+    z-index: 1;
+}
+
+
+
+.siteSelection h4 {
     margin: 0 0 10px;
 }
 
-.legend div span {
-    border-radius: 0%;
+.siteSelection div span {
     display: inline-block;
     height: 1.5vh;
     margin-right: 0.25vw;
-    width: 30px;
+    width: 1.5vh;
+
+    -moz-border-radius: 50%; /* or 50% */
+    border-radius: 50%; /* or 50% */
+
+}
+
+
+
+.vernalPools {
+    background-color: #fff;
+    position: relative;
+    left: 0;
+    top: 0vh;
+    margin-bottom: 1vh;
+    border-radius: 3px;
+    bottom: 30px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font: 16px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    padding: 10px;
+    width: 100%;
+    height: 17vh;
+    z-index: 1;
+}
+
+
+
+.vernalPools h4 {
+    margin: 0 0 10px;
+}
+
+.vernalPools div span {
+    display: inline-block;
+    height: 1.5vh;
+    margin-right: 0.25vw;
+    width: 1.5vh;
+    opacity: 0.5;
+
 }
