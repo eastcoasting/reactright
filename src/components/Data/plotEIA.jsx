@@ -1,10 +1,10 @@
-import React, {useRef, useState} from "react";
+import React, {useRef, useState, useEffect, setState} from "react";
 import Plotly from "plotly.js"
 import Select from 'react-select'
 
 import createPlotlyComponent from 'react-plotly.js/factory';
 import {useQuery} from "react-query";
-
+import { ReactQueryDevtools} from 'react-query-devtools';
 
 const Plot = createPlotlyComponent(Plotly);
 
@@ -17,76 +17,16 @@ export const PlotEIA = ({
                                  onClick
                              }) => {
 
-    const Xvalues = [];
-
-
-    const {  data } = useQuery("repoData", () =>
-        fetch(
-            "https://api.eia.gov/series/?api_key=84b2ffa162be7397b1aa46838f3f89bb&series_id=ELEC.PRICE.ME-ALL.Q"
-        ).then((res) => res.json()
-            .then(
-                function(data) {
-                    console.log(data.series[0]);
-
-         /*           for (var key in data.series[0].data) {
-                        Xvalues.push(key);
-
-
-                         console.log(Xvalues)
-                    }*/
-
-                    const data2 = data.series[0].data
-
-                    let rows = data2.length
-                    /*console.log(rows)
-                    console.log(data2)
-*/
-                    for(let i=0; i<rows; i++){
-                        let items = data2[i].length;
-                        /*console.log(data2)*/
-                        console.log(items);
-
-                        for(let n=0; n<items; n++){
-                            Xvalues.push(data2[i][n]);
-/*
-                            console.log(Xvalues);
-*/
-
-
-                        }
-                    }
-
-
-
-                }
-
-            )
-
-        )
-    );
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     const dataChartNode = useRef();
 
     const options = [
-        { value: 'line', label: 'Line' },
-        { value: 'bar', label: 'Bar' }
+        { value: 'NG.N3035ME3.M' , label:'Natural Gas', axisLabel: 'none'  },
+        { value: 'ELEC.PRICE.ME-ALL.Q', label:  'Electricity', axisLabel: 'none'}
     ];
 
-    const initialFormState = { mySelectKey: 'line' };
+    const initialFormState = { mySelectKey: "ELEC.PRICE.ME-ALL.Q" };
 
     const [myForm, setMyForm] = useState(initialFormState);
 
@@ -95,15 +35,65 @@ export const PlotEIA = ({
     };
 
 
+
+
+    const { data } = useQuery(`${myForm.mySelectKey}`, () =>
+        fetch(
+            `https://api.eia.gov/series/?api_key=84b2ffa162be7397b1aa46838f3f89bb&series_id=${myForm.mySelectKey}`
+        ).then((res) => res.json()
+        ),
+        {refetchOnMount : false}
+    );
+
+
+
+
+
+
+
+    const [stateX, setStateX] = React.useState([])
+
+    React.useEffect(() => {
+
+        if (!data) {
+        } else {
+
+            if (data) {
+
+                setStateX(data.series[0].data.map(x => x[1]))
+
+            }
+        }
+    }, [data])
+
+
+
+    const [stateY, setStateY] = React.useState([])
+
+    React.useEffect(() => {
+            if (!data) {
+            } else {
+
+                if (data) {
+
+
+                    setStateY(data.series[0].data.map(x => x[0]))
+
+                }
+            }
+    }, [data])
+
+
+
     const chartData = [
         {
-            x: [1],
-            y: [2],
-            type: `${myForm.mySelectKey}`,
+            x: stateY,
+            y: stateX,
+            type: 'line',
             marker: {color: barColorInput},
             showlegend: true,
-            xaxis: "x",
-            yaxis: "y"
+            xaxis: "Average retail price of electricity",
+            yaxis: "cents per kilowatthour"
         }
     ];
 
@@ -111,7 +101,8 @@ export const PlotEIA = ({
 
     return (
 
-        <div className={"plot"} >
+
+    <div className={"plot"} >
 
            <div className={"toggle"} style={{width: '150px'}}>
                <Select
@@ -124,23 +115,6 @@ export const PlotEIA = ({
                />
            </div>
 
-            <div className="col-lg-5">
-
-                {status === 'error' && (
-                    <div>Error fetching data</div>
-                )}
-
-                {status === 'loading' && (
-                    <div>Loading data...</div>
-                )}
-
-             {/*   {status === 'success' && (
-                    <div>
-                        {data.series.map(EIA => <div>{EIA.data}</div>)}
-                    </div>
-                )}*/}
-
-            </div>
 
         <Plot
             ref={dataChartNode}
@@ -148,17 +122,15 @@ export const PlotEIA = ({
             layout={{
                 height: heightP,
                 width: widthP,
-                title: "Area of ECLs",
-                xaxis: { type: 'category' },
+                title: `Average retail price of ${myForm.mySelectKey} - Maine`,
                 legend: {
-                    orientation: "h"
+                    orientation: "v"
                 },
-                margin: {
-                    b: 40,
-                    t: 50,
-                    l: 60,
-                    r: 10
-                }
+                yaxis: {
+                    title: "Average retail price of electricity (USD)"},
+
+
+
             }}
             config={{
                 displaylogo: false,
@@ -182,6 +154,7 @@ export const PlotEIA = ({
             onClick={onClick}
 */
         />
+        <ReactQueryDevtools initialIsOpen={false}/>
         </div>
 
 
