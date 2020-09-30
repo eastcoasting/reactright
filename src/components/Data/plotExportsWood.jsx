@@ -9,7 +9,7 @@ const Plot = createPlotlyComponent(Plotly);
 
 
 
-export const PlotExports = ({
+export const PlotExportsWood = ({
                             heightP,
                             widthP,
                             barColorInput,
@@ -38,7 +38,7 @@ export const PlotExports = ({
         return censusPromise({
             vintage: "timeseries", // required
             sourcePath: ["intltrade", "exports", "statenaics"], // required
-            values: ["NAICS", "ALL_VAL_YR"],
+            values: ["NAICS", "ALL_VAL_MO"],
             predicates: {STATE:"ME", time: "from+2013-04", NAICS: "3219" },
             statsKey: "a019e5781e0a1ae25a17230a2e4404585c4ac414"
         })
@@ -48,7 +48,7 @@ export const PlotExports = ({
         return censusPromise({
             vintage: "timeseries", // required
             sourcePath: ["intltrade", "exports", "statenaics"], // required
-            values: ["NAICS", "ALL_VAL_YR"],
+            values: ["NAICS", "ALL_VAL_MO"],
             predicates: {STATE:"ME", time: "from+2013-04", NAICS: "3211" },
             statsKey: "a019e5781e0a1ae25a17230a2e4404585c4ac414"
         })
@@ -58,7 +58,7 @@ export const PlotExports = ({
         return censusPromise({
             vintage: "timeseries", // required
             sourcePath: ["intltrade", "exports", "statenaics"], // required
-            values: ["NAICS", "ALL_VAL_YR"],
+            values: ["NAICS", "ALL_VAL_MO"],
             predicates: {STATE:"ME", time: "from+2013-04", NAICS: "3212" },
             statsKey: "a019e5781e0a1ae25a17230a2e4404585c4ac414"
         })
@@ -99,7 +99,7 @@ export const PlotExports = ({
 
                 for (var key in Sawmills) {
                     setDataTableYSawmills.push(Sawmills[key].time);
-                    setDataTableXSawmills.push(Sawmills[key].ALL_VAL_YR);
+                    setDataTableXSawmills.push(Sawmills[key].ALL_VAL_MO);
 
                 }
                 setStateXSawmills(setDataTableXSawmills);
@@ -107,7 +107,7 @@ export const PlotExports = ({
 
                 for (var key in Veneer) {
                     setDataTableYVeneer.push(Veneer[key].time);
-                    setDataTableXVeneer.push(Veneer[key].ALL_VAL_YR);
+                    setDataTableXVeneer.push(Veneer[key].ALL_VAL_MO);
 
                 }
 
@@ -116,7 +116,7 @@ export const PlotExports = ({
 
                 for (var key in Other) {
                     setDataTableYOther.push(Other[key].time);
-                    setDataTableXOther.push(Other[key].ALL_VAL_YR);
+                    setDataTableXOther.push(Other[key].ALL_VAL_MO);
 
                 }
 
@@ -162,7 +162,8 @@ export const PlotExports = ({
     return (
 
 
-        <div className={"plotEIA"} >
+        <div className={"plotExportsWood"}
+             style={{width: '50%'}}>
 
 
             <Plot
@@ -171,7 +172,7 @@ export const PlotExports = ({
                 layout={{
                     height: heightP,
                     width: widthP,
-                    title: 'Monthly Maine Exports by NACIS Code',
+                    title: 'Monthly Maine Wood Product Manufacturing Exports by NACIS Code',
                     legend: {
                         orientation: "v"
                     },

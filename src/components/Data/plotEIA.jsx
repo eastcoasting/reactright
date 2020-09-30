@@ -7,7 +7,35 @@ import {useQuery} from "react-query";
 
 const Plot = createPlotlyComponent(Plotly);
 
+const customStyles = {
+    control: (provided, state) => ({
+        ...provided,
+        background: '#fff',
+        borderColor: '#9e9e9e',
+        minHeight: '30px',
+        marginBottom: '0px',
+        height: '30px',
+        boxShadow: state.isFocused ? null : null,
+    }),
 
+    valueContainer: (provided, state) => ({
+        ...provided,
+        height: '30px',
+        padding: '0 px'
+    }),
+
+    input: (provided, state) => ({
+        ...provided,
+        margin: '0px',
+    }),
+    indicatorSeparator: state => ({
+        display: 'none',
+    }),
+    indicatorsContainer: (provided, state) => ({
+        ...provided,
+        height: '30px',
+    }),
+};
 
 export const PlotEIA = ({
                                  heightP,
@@ -87,7 +115,6 @@ export const PlotEIA = ({
             if (!data) {
             } else {
                 const [ME, NE] = data;
-                console.log(ME)
 
                 if (data) {
 
@@ -131,8 +158,10 @@ export const PlotEIA = ({
 
     <div className={"plotEIA"} >
 
-           <div className={"toggle"} style={{width: '200px'}}>
+           <div className={"toggleContainer"} style={{width: '200px'}}>
                <Select
+                   className={"toggle"}
+                   styles={customStyles}
                    name="mySelect"
                    value={options.filter(({ value }) => value === myForm.mySelectKey)}
                    getOptionLabel={({ label }) => label}

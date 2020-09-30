@@ -54,10 +54,10 @@ export const MapboxGLMap = ({
     const [ sliderValueE, setSliderValueE ] = useState(100);
 
     const [ visibilityF, setVisibilityF]= useState('none')
-    const [ sliderValueF, setSliderValueF ] = useState(100);
+    const [ sliderValueF, setSliderValueF ] = useState(70);
 
     const [ visibilityG, setVisibilityG]= useState('none')
-    const [ sliderValueG, setSliderValueG ] = useState(100);
+    const [ sliderValueG, setSliderValueG ] = useState(70);
 
     const landClassStyles = ['BioMass',
         '#fbb03b',
@@ -302,35 +302,73 @@ export const MapboxGLMap = ({
             ///////////////////////////////////////////////////////////
 
             // Change the cursor to a pointer when the mouse is over the layer.
-            mapboxGlMap.on('mouseenter', 'vernalPools', function () {
+            mapboxGlMap.on('mouseenter', 'siteSelection', function () {
                 mapboxGlMap.getCanvas().style.cursor = 'pointer';
             });
 
             // Change it back to a pointer when it leaves.
-            mapboxGlMap.on('mouseleave', 'vernalPools', function () {
+            mapboxGlMap.on('mouseleave', 'siteSelection', function () {
                 mapboxGlMap.getCanvas().style.cursor = '';
             });
 
             // When AOI is clicked
-            mapboxGlMap.on('click', 'vernalPools', function (e) {
+            mapboxGlMap.on('click', 'siteSelection', function (e) {
                 //Popup
                 new mapboxgl.Popup()
                     .setLngLat(e.lngLat)
-                    .setHTML('<h3> ELC ID: ' + e.features[0].properties.id + '</h3>'
+                    .setHTML('<h5> ' + e.features[0].properties.Name + '</h5>'
                         + '<hr>' +
-                        '<h4> Shape Area: ' + Math.round(e.features[0].properties.Shape_Area) + '</h4>')
+                        '<h6> Town/Zip: ' + e.features[0].properties.Town + ' (' + e.features[0].properties.ZipCode + ')' + '</h6>' +
+                        '<hr>' +
+                        '<h6> Lot Size (Acres): ' + e.features[0].properties.BrownfieldAcres + '</h6>'
+                        + '<hr>' +
+                        '<h6> Capacity: ' + e.features[0].properties.Capacity + '</h6>'
+                        + '<hr>' +
+                        '<h6> Notes: ' + e.features[0].properties.Notes + '</h6>'
+                    )
                     .addTo(mapboxGlMap);
-
-       /*         //Zoom in
-                const coordinates = e.features[0].geometry.coordinates[0];
-                const bounds = coordinates.reduce(function (bounds, coord) {
-                    return bounds.extend(coord);
-                }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+            });
 
 
-                mapboxGlMap.fitBounds(bounds, {
-                    padding: 100
-                });*/
+
+            mapboxGlMap.on('click', 'qualifiedOpportunityZones', function (e) {
+                    //Popup
+                    new mapboxgl.Popup()
+                        .setLngLat(e.lngLat)
+                        .setHTML('<h5> ' + e.features[0].properties.NAMELSAD + '</h5>'
+                            + '<hr>' +
+                            '<h6> County: ' + e.features[0].properties.County + '</h6>' +
+                            '<hr>' +
+                            '<h6> Tract Type: ' + e.features[0].properties.Tract_Type + '</h6>'
+                        )
+                        .addTo(mapboxGlMap);
+                });
+
+            mapboxGlMap.on('click', 'newMarketTaxCredits', function (e) {
+                //Popup
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML('<h5> ' + e.features[0].properties.NAMELSAD + '</h5>'
+                        + '<hr>' +
+                        '<h6> County Name: ' + e.features[0].properties.County_Name + '</h6>'
+                        + '<hr>' +
+                        '<h6> Unemployment Rate: ' + e.features[0].properties.Census_Tract_Unemployment_Rate_____2011_2015 + '</h6>'
+
+                    )
+                    .addTo(mapboxGlMap);
+            });
+
+
+                /*         //Zoom in
+                         const coordinates = e.features[0].geometry.coordinates[0];
+                         const bounds = coordinates.reduce(function (bounds, coord) {
+                             return bounds.extend(coord);
+                         }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+
+                         mapboxGlMap.fitBounds(bounds, {
+                             padding: 100
+                         });*/
 
                 //color bounds
                 // mapboxGlMap.setPaintProperty('aoi-highlight', 'line-color', [
@@ -340,7 +378,6 @@ export const MapboxGLMap = ({
                 //     'rgba(0,0,0,0)'
                 // ]);
 
-            });
 
             const layerStyles = mapboxGlMap.getStyle().layers
 
