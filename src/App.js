@@ -1,10 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, HashRouter } from "react-router-dom";
 import { Navigation, /*Footer,*/ Home, About, Contact } from "./components";
 function App() {
   return (
     <div className="App">
-      <Router>
+      <HashRouter basename="/">
         <Navigation />
         <Switch>
           <Route path="/" exact component={() => <Home />} />
@@ -12,7 +12,7 @@ function App() {
           <Route path="/contact" exact component={() => <Contact />} />
         </Switch>
         {/*<Footer />*/}
-      </Router>
+      </HashRouter>
     </div>
   );
 }
