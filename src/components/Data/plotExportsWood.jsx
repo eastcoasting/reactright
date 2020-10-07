@@ -136,7 +136,9 @@ export const PlotExportsWood = ({
             type: 'line',
             name: 'Sawmills and wood<br>preservation',
             marker: {color: barColorInput},
-            showlegend: true
+            showlegend: true,
+            hovertemplate: '%{y:$.2s}'
+
         },
         {
             x: stateYVeneer,
@@ -144,7 +146,9 @@ export const PlotExportsWood = ({
             type: 'line',
             name: 'Veneer, plywood and<br>engineered wood product<br>manufacturing',
             marker: {color: barColorInput},
-            showlegend: true
+            showlegend: true,
+            hovertemplate: '%{y:$.2s}'
+
         },
         {
             x: stateYOther,
@@ -152,7 +156,9 @@ export const PlotExportsWood = ({
             type: 'line',
             name: 'Other wood product<br>manufacturing',
             marker: {color: barColorInput},
-            showlegend: true
+            showlegend: true,
+            hovertemplate: '%{y:$.2s}'
+
         }
     ];
 
@@ -167,12 +173,12 @@ export const PlotExportsWood = ({
 
 
             <Plot
+                style={{width: '37.5vw', height: '75vh', right: 0}}
                 ref={dataChartNode}
                 data={chartData}
                 layout={{
-                    height: heightP,
-                    width: widthP,
-                    title: 'Monthly Maine Wood Product Manufacturing Exports by NACIS Code',
+                    autosize: true,
+                    title: 'Monthly Wood Product Exports',
                     legend: {
                         orientation: "v"
                     },

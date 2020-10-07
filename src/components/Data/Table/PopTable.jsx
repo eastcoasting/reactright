@@ -90,7 +90,7 @@ const PopTable = () => {
     );
 
     return (
-        <Container style={{ marginTop: 100, maxWidth: '50%'}}>
+        <Container style={{ marginTop: 100, maxWidth: '90%'}}>
             <TableContainer
                 columns={columns}
                 data={dataTable}

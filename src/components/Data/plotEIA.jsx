@@ -38,8 +38,6 @@ const customStyles = {
 };
 
 export const PlotEIA = ({
-                                 heightP,
-                                 widthP,
                                  barColorInput,
                                  onClick
                              }) => {
@@ -84,6 +82,8 @@ export const PlotEIA = ({
     }
 
     const { data } = useQuery(`${myForm.mySelectKey}`, getFavorites);
+    console.log(data)
+
 
 
     const [stateX, setStateX] = React.useState([])
@@ -96,10 +96,13 @@ export const PlotEIA = ({
         } else {
             const [ME, NE] = data;
 
+
             if (data) {
 
-                setStateX(ME.series[0].data.map(x => x[1]))
-                setStateX2(NE.series[0].data.map(x => x[1]))
+                //Reverse required for EIA data with YYYYQ# System
+                setStateX(ME.series[0].data.map(x => x[1]).reverse())
+                setStateX2(NE.series[0].data.map(x => x[1]).reverse())
+                console.log(stateY2)
 
 
             }
@@ -118,9 +121,9 @@ export const PlotEIA = ({
 
                 if (data) {
 
-
-                    setStateY(ME.series[0].data.map(x => x[0]))
-                    setStateY2(NE.series[0].data.map(x => x[0]))
+                    //Reverse required for EIA data with YYYYQ# System
+                    setStateY(ME.series[0].data.map(x => x[0]).reverse())
+                    setStateY2(NE.series[0].data.map(x => x[0]).reverse())
 
 
                 }
@@ -158,9 +161,10 @@ export const PlotEIA = ({
 
     <div className={"plotEIA"} >
 
-           <div className={"toggleContainer"} style={{width: '200px'}}>
+           <div className={"toggleContainer"}  style={{width: '75vw'}}
+           >
                <Select
-                   className={"toggle"}
+                   className={"toggleEIA"}
                    styles={customStyles}
                    name="mySelect"
                    value={options.filter(({ value }) => value === myForm.mySelectKey)}
@@ -174,11 +178,11 @@ export const PlotEIA = ({
 
 
         <Plot
+            style={{width: '75vw', height: '75vh', right: 0}}
             ref={dataChartNode}
             data={chartData}
             layout={{
-                height: heightP,
-                width: widthP,
+                autosize: true,
                 title: `Average industrial price of ${myLabel.mySelectLabel}`,
                 legend: {
                     orientation: "v"

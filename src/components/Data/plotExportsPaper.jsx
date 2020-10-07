@@ -114,7 +114,9 @@ export const PlotExportsPaper = ({
             type: 'line',
             name: 'Converted paper product<br>manufacturing',
             marker: {color: barColorInput},
-            showlegend: true
+            showlegend: true,
+            hovertemplate: '%{y:$.2s}'
+
         },
         {
             x: stateYPulp,
@@ -122,7 +124,9 @@ export const PlotExportsPaper = ({
             type: 'line',
             name: 'Pulp, paper and<br>paperboard mills',
             marker: {color: barColorInput},
-            showlegend: true
+            showlegend: true,
+            hovertemplate: '%{y:$.2s}'
+
         }
     ];
 
@@ -135,12 +139,12 @@ export const PlotExportsPaper = ({
         <div className={"plotExportsPaper"}
              style={{flexGrow: 1}}>
             <Plot
+                style={{width: '37.5vw', height: '75vh', right: 0}}
                 ref={dataChartNode}
                 data={chartData}
                 layout={{
-                    height: heightP,
-                    width: widthP,
-                    title: 'Monthly Maine Paper Manufacturing Exports by NACIS Code',
+                    autosize: true,
+                    title: 'Monthly Paper Manufacturing Exports',
                     legend: {
                         orientation: "v"
                     },

@@ -2,16 +2,49 @@ import React, {useRef, useState, useEffect, setState} from "react";
 import Plotly from "plotly.js"
 
 import createPlotlyComponent from 'react-plotly.js/factory';
+
 import {useQuery} from "react-query";
 import census from "citysdk";
+import Select from "react-select";
+import { groupedOptions } from './selectGroups'
 
 const Plot = createPlotlyComponent(Plotly);
 
 
 
+const customStyles = {
+    control: (provided, state) => ({
+        ...provided,
+        background: '#fff',
+        borderColor: '#9e9e9e',
+        minHeight: '30px',
+        marginBottom: '0px',
+        height: '30px',
+        boxShadow: state.isFocused ? null : null,
+    }),
+
+    valueContainer: (provided, state) => ({
+        ...provided,
+        height: '30px',
+        padding: '0 px'
+    }),
+
+    input: (provided, state) => ({
+        ...provided,
+        margin: '0px',
+    }),
+    indicatorSeparator: state => ({
+        display: 'none',
+    }),
+    indicatorsContainer: (provided, state) => ({
+        ...provided,
+        height: '30px',
+    }),
+};
+
+
+
 export const PlotHSExports = ({
-                            heightP,
-                            widthP,
                             barColorInput,
                             onClick
                         }) => {
@@ -19,6 +52,19 @@ export const PlotHSExports = ({
 
 
     const dataChartNode = useRef();
+
+
+
+    const initialFormState = { mySelectHS: "4703" };
+    const [myHSCode, setMyHSCode] = useState(initialFormState);
+
+    const initialLabelState = { mySelectHSLabel: "Chemical woodpulp, soda or sulfate, other than dissolving grades" };
+    const [myHSCodeLabel, setMyHSCodeLabel] = useState(initialLabelState);
+
+    const updateForm = (value, label) => {
+        setMyHSCode({ ...myHSCode, mySelectHS: value });
+        setMyHSCodeLabel({ ...myHSCodeLabel, mySelectHSLabel: label });
+    };
 
 
     function censusPromise(args) {
@@ -39,7 +85,7 @@ export const PlotHSExports = ({
             vintage: "timeseries", // required
             sourcePath: ["intltrade", "exports", "statehs"], // required
             values: ["CTY_CODE", "CTY_NAME", "ALL_VAL_MO"],
-            predicates: {STATE:"ME", time: "from+2013-04", E_COMMODITY: "4701", CTY_CODE: "0003" },
+            predicates: {STATE:"ME", time: "from+2013-04", E_COMMODITY: `${myHSCode.mySelectHS}`, CTY_CODE: "1XXX" },
             statsKey: "a019e5781e0a1ae25a17230a2e4404585c4ac414"
         })
     }
@@ -49,7 +95,7 @@ export const PlotHSExports = ({
             vintage: "timeseries", // required
             sourcePath: ["intltrade", "exports", "statehs"], // required
             values: ["CTY_CODE", "CTY_NAME", "ALL_VAL_MO"],
-            predicates: {STATE:"ME", time: "from+2013-04", E_COMMODITY: "0025" },
+            predicates: {STATE:"ME", time: "from+2013-04", E_COMMODITY: `${myHSCode.mySelectHS}`, CTY_CODE: "3XXX" },
             statsKey: "a019e5781e0a1ae25a17230a2e4404585c4ac414"
         })
     }
@@ -59,72 +105,137 @@ export const PlotHSExports = ({
             vintage: "timeseries", // required
             sourcePath: ["intltrade", "exports", "statehs"], // required
             values: ["CTY_CODE", "CTY_NAME", "ALL_VAL_MO"],
-            predicates: {STATE:"ME", time: "from+2013-04", E_COMMODITY: "4401" },
+            predicates: {STATE:"ME", time: "from+2013-04", E_COMMODITY: `${myHSCode.mySelectHS}`, CTY_CODE: "4XXX" },
             statsKey: "a019e5781e0a1ae25a17230a2e4404585c4ac414"
         })
     }
 
+    function getCensusExportsIV() {
+        return censusPromise({
+            vintage: "timeseries", // required
+            sourcePath: ["intltrade", "exports", "statehs"], // required
+            values: ["CTY_CODE", "CTY_NAME", "ALL_VAL_MO"],
+            predicates: {STATE:"ME", time: "from+2013-04", E_COMMODITY: `${myHSCode.mySelectHS}`, CTY_CODE: "5XXX" },
+            statsKey: "a019e5781e0a1ae25a17230a2e4404585c4ac414"
+        })
+    }
+
+    function getCensusExportsV() {
+        return censusPromise({
+            vintage: "timeseries", // required
+            sourcePath: ["intltrade", "exports", "statehs"], // required
+            values: ["CTY_CODE", "CTY_NAME", "ALL_VAL_MO"],
+            predicates: {STATE:"ME", time: "from+2013-04", E_COMMODITY: `${myHSCode.mySelectHS}`, CTY_CODE: "6XXX" },
+            statsKey: "a019e5781e0a1ae25a17230a2e4404585c4ac414"
+        })
+    }
+
+
+
     function getAllExports() {
-        return Promise.all([getCensusExportsI(), getCensusExportsII(), getCensusExportsIII()])
+        return Promise.all([getCensusExportsI(), getCensusExportsII(), getCensusExportsIII(), getCensusExportsIV(), getCensusExportsV()])
             .then(data => data);
     }
 
 
 
-    const { data } = useQuery('HSExports', getAllExports);
-
-    const [stateXSawmills, setStateXSawmills] = React.useState([])
-    const [stateYSawmills, setStateYSawmills] = React.useState([])
-    const setDataTableXSawmills = [];
-    const setDataTableYSawmills = [];
-
-    const [stateXVeneer, setStateXVeneer] = React.useState([])
-    const [stateYVeneer, setStateYVeneer] = React.useState([])
-    const setDataTableXVeneer = [];
-    const setDataTableYVeneer = [];
+    const { data } = useQuery(`${myHSCodeLabel.mySelectHSLabel}`, getAllExports);
 
 
-    const [stateXOther, setStateXOther] = React.useState([])
-    const [stateYOther, setStateYOther] = React.useState([])
-    const setDataTableXOther = [];
-    const setDataTableYOther = [];
+    const [stateXI, setStateXI] = React.useState([])
+    const [stateYI, setStateYI] = React.useState([])
+    const setDataTableXI = [];
+    const setDataTableYI = [];
+
+    const [stateXII, setStateXII] = React.useState([])
+    const [stateYII, setStateYII] = React.useState([])
+    const setDataTableXII = [];
+    const setDataTableYII = [];
+
+
+    const [stateXIII, setStateXIII] = React.useState([])
+    const [stateYIII, setStateYIII] = React.useState([])
+    const setDataTableXIII = [];
+    const setDataTableYIII = [];
+
+    const [stateXIV, setStateXIV] = React.useState([])
+    const [stateYIV, setStateYIV] = React.useState([])
+    const setDataTableXIV = [];
+    const setDataTableYIV = [];
+
+    const [stateXV, setStateXV] = React.useState([])
+    const [stateYV, setStateYV] = React.useState([])
+    const setDataTableXV = [];
+    const setDataTableYV = [];
 
     React.useEffect(() => {
 
         if (!data) {
         } else {
-            const [Sawmills, Other, Veneer] = data;
+            const [I, II, III, IV, V] = data;
 
             if (data) {
 
-                for (var key in Sawmills) {
-                    setDataTableYSawmills.push(Sawmills[key].time);
-                    setDataTableXSawmills.push(Sawmills[key].ALL_VAL_MO);
+                I.sort(function(a,b){
+                    return new Date(b.time) - new Date(a.time);
+                });
+
+                for (var key in I) {
+                    setDataTableYI.push(I[key].time);
+                    setDataTableXI.push(I[key].ALL_VAL_MO);
+                }
+                setStateXI(setDataTableXI);
+                setStateYI(setDataTableYI);
+
+
+                II.sort(function(a,b){
+                    return new Date(b.time) - new Date(a.time);
+                });
+
+                for (var key in II) {
+                    setDataTableYII.push(II[key].time);
+                    setDataTableXII.push(II[key].ALL_VAL_MO);
 
                 }
-                setStateXSawmills(setDataTableXSawmills);
-                setStateYSawmills(setDataTableYSawmills);
-                console.log(setDataTableYSawmills)
+                setStateXII(setDataTableXII);
+                setStateYII(setDataTableYII);
 
+                III.sort(function(a,b){
+                    return new Date(b.time) - new Date(a.time);
+                });
 
+                for (var key in III) {
+                    setDataTableYIII.push(III[key].time);
+                    setDataTableXIII.push(III[key].ALL_VAL_MO);
+                }
+                setStateXIII(setDataTableXIII);
+                setStateYIII(setDataTableYIII);
 
-                for (var key in Veneer) {
-                    setDataTableYVeneer.push(Veneer[key].time);
-                    setDataTableXVeneer.push(Veneer[key].ALL_VAL_YR);
+                IV.sort(function(a,b){
+                    return new Date(b.time) - new Date(a.time);
+                });
+
+                for (var key in IV) {
+                    setDataTableYIV.push(IV[key].time);
+                    setDataTableXIV.push(IV[key].ALL_VAL_MO);
 
                 }
+                setStateXIV(setDataTableXIV);
+                setStateYIV(setDataTableYIV);
 
-                setStateXVeneer(setDataTableXVeneer);
-                setStateYVeneer(setDataTableYVeneer);
+                V.sort(function(a,b){
+                    return new Date(b.time) - new Date(a.time);
+                });
 
-                for (var key in Other) {
-                    setDataTableYOther.push(Other[key].time);
-                    setDataTableXOther.push(Other[key].ALL_VAL_YR);
+                for (var key in V) {
+                    setDataTableYV.push(V[key].time);
+                    setDataTableXV.push(V[key].ALL_VAL_MO);
 
                 }
+                setStateXV(setDataTableXV);
+                setStateYV(setDataTableYV);
 
-                setStateXOther(setDataTableXOther);
-                setStateYOther(setDataTableYOther);
+
             }
         }
     }, [data])
@@ -134,28 +245,51 @@ export const PlotHSExports = ({
 
     const chartData = [
         {
-            x: stateYSawmills,
-            y: stateXSawmills,
-            type: 'scatter',
-            name: 'Sawmills and wood<br>preservation',
+            x: stateYI,
+            y: stateXI,
+            type: 'line',
+            name: 'North America',
             marker: {color: barColorInput},
-            showlegend: true
+            showlegend: true,
+            hovertemplate: '%{y:$.2s}'
+
         },
         {
-            x: stateYVeneer,
-            y: stateXVeneer,
-            type: 'scatter',
-            name: 'Veneer, plywood and<br>engineered wood product<br>manufacturing',
+            x: stateYII,
+            y: stateXII,
+            type: 'line',
+            name: 'South America',
             marker: {color: barColorInput},
-            showlegend: true
+            showlegend: true,
+            hovertemplate: '%{y:$.2s}'
+
         },
         {
-            x: stateYOther,
-            y: stateXOther,
-            type: 'scatter',
-            name: 'Other wood product<br>manufacturing',
+            x: stateYIII,
+            y: stateXIII,
+            type: 'line',
+            name: 'Europe',
             marker: {color: barColorInput},
-            showlegend: true
+            showlegend: true,
+            hovertemplate: '%{y:$.2s}'
+        },
+        {
+            x: stateYIV,
+            y: stateXIV,
+            type: 'line',
+            name: 'Asia',
+            marker: {color: barColorInput},
+            showlegend: true,
+            hovertemplate: '%{y:$.2s}'
+        },
+        {
+            x: stateYV,
+            y: stateXV,
+            type: 'line',
+            name: 'Australia and Oceania',
+            marker: {color: barColorInput},
+            showlegend: true,
+            hovertemplate: '%{y:$.2s}'
         }
     ];
 
@@ -165,17 +299,28 @@ export const PlotHSExports = ({
     return (
 
 
-        <div className={"PlotHSExports"}
-             style={{width: '50%'}}>
+        <div className={"PlotHSExports"}>
 
+
+            <div className={"toggleContainer"} style={{width: '75vw'}}>
+            <h3>Monthly Maine Manufacturing Exports for</h3>
+                <Select
+                    className={"toggleHS"}
+                    styles={customStyles}
+                    name="mySelect"
+                    getOptionLabel={({ label }) => label}
+                    getOptionValue={({ value }) => value}
+                    onChange={({ value, label }) => updateForm(value, label)}
+                    options={groupedOptions}
+                />
+            </div>
 
             <Plot
+                style={{width: '75vw', height: '75vh', right: 0}}
                 ref={dataChartNode}
                 data={chartData}
                 layout={{
-                    height: heightP,
-                    width: widthP,
-                    title: 'Monthly Maine Wood Product Manufacturing Exports by NACIS Code',
+                    autosize: true,
                     legend: {
                         orientation: "v"
                     },
